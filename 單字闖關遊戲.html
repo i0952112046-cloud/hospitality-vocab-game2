@@ -429,7 +429,7 @@
   <div id="login-modal" class="modal-overlay">
     <div class="glass-card modal-content">
       <h2 style="text-align: center; margin-bottom: 20px; font-family: 'Outfit', sans-serif;">登入餐飲服務闖關系統</h2>
-      <form id="login-form">
+      <form id="login-form" onsubmit="handleLogin(event)">
         <div class="form-group">
           <label><i class="fa-solid fa-graduation-cap"></i> 年級</label>
           <select id="select-grade" class="form-control" required>
@@ -441,7 +441,7 @@
           <label><i class="fa-solid fa-user-tag"></i> 座號 (1 ~ 40)</label>
           <input type="number" id="input-seat" class="form-control" min="1" max="40" placeholder="請輸入座號" required>
         </div>
-        <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;">
+        <button type="button" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="handleLogin(event)">
           <i class="fa-solid fa-play"></i> 開始挑戰
         </button>
       </form>
@@ -777,12 +777,15 @@
     }
 
     function handleLogin(e) {
-      e.preventDefault();
-      const grade = parseInt(document.getElementById('select-grade').value);
-      const seat = parseInt(document.getElementById('input-seat').value);
+      if (e) e.preventDefault();
+      const gradeInput = document.getElementById('select-grade');
+      const seatInput = document.getElementById('input-seat');
 
-      if (!seat || seat < 1 || seat > 40) {
-        alert('請輸入 1 至 40 之間的正確座號');
+      const grade = gradeInput ? parseInt(gradeInput.value) : 2;
+      const seat = seatInput ? parseInt(seatInput.value) : 40;
+
+      if (!seat || isNaN(seat) || seat < 1 || seat > 40) {
+        alert('請輸入 1 至 40 之間的正確座號 (1~40)');
         return;
       }
 
@@ -793,8 +796,13 @@
       localStorage.setItem('vocab_user_seat', seat);
       
       document.getElementById('login-modal').style.display = 'none';
-      updateUserUI();
-      renderLevelGrid();
+      
+      try {
+        updateUserUI();
+        renderLevelGrid();
+      } catch(err) {
+        console.error("更新闖關地圖發生錯誤：", err);
+      }
     }
 
     function switchUser() {
@@ -811,20 +819,23 @@
 
     function getLevelStats(levelKey) {
       loadLocalScores();
-      const records = localScoresHistory.filter(i => i.grade === currentUser.grade && String(i.level) === String(levelKey));
+      if (!Array.isArray(localScoresHistory)) localScoresHistory = [];
+      const records = localScoresHistory.filter(i => i && i.grade === currentUser.grade && String(i.level) === String(levelKey));
       
-      const myRecords = records.filter(i => i.seat_no === currentUser.seat);
+      const myRecords = records.filter(i => i && i.seat_no === currentUser.seat);
       if (myRecords.length === 0) {
         return { hasPlayed: false, bestScore: null, rank: null };
       }
 
-      const myBestScore = Math.max(...myRecords.map(i => i.score));
+      const myBestScore = Math.max(...myRecords.map(i => i.score || 0));
 
       // 計算同級單元排名
       const seatBest = {};
       records.forEach(item => {
-        if (!seatBest[item.seat_no] || item.score > seatBest[item.seat_no]) {
-          seatBest[item.seat_no] = item.score;
+        if (item && item.seat_no) {
+          if (!seatBest[item.seat_no] || item.score > seatBest[item.seat_no]) {
+            seatBest[item.seat_no] = item.score;
+          }
         }
       });
 
