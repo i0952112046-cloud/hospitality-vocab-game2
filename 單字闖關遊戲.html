@@ -753,6 +753,7 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => {
+      loadLocalScores();
       loadUserData();
       document.getElementById('login-form').addEventListener('submit', handleLogin);
     });
@@ -1072,21 +1073,31 @@
       renderLevelGrid();
     }
 
+    function loadLocalScores() {
+      try {
+        const saved = localStorage.getItem('vocab_local_scores');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            localScoresHistory = parsed;
+          }
+        }
+      } catch(e){}
+    }
+
+    function saveLocalScores() {
+      try {
+        localStorage.setItem('vocab_local_scores', JSON.stringify(localScoresHistory));
+      } catch(e){}
+    }
+
     function renderPerLevelRankings(levelKey, currentScore) {
+      loadLocalScores();
       document.getElementById('rank-grade-text').innerText = currentUser.grade;
 
       // 提取同年級、當關最高分
-      const gradeScores = localScoresHistory.filter(item => item.grade === currentUser.grade && item.level == levelKey);
+      const gradeScores = localScoresHistory.filter(item => item.grade === currentUser.grade && String(item.level) === String(levelKey));
       
-      // 加入當前成績
-      gradeScores.push({
-        grade: currentUser.grade,
-        seat_no: currentUser.seat,
-        level: levelKey,
-        score: currentScore
-      });
-
-      // 每個座號保留最高得分
       const seatBest = {};
       gradeScores.forEach(item => {
         if (!seatBest[item.seat_no] || item.score > seatBest[item.seat_no]) {
@@ -1144,6 +1155,7 @@
     }
 
     function renderGlobalLeaderboard() {
+      loadLocalScores();
       const container = document.getElementById('global-rank-list');
       container.innerHTML = '';
 
@@ -1153,20 +1165,19 @@
         studentTotalScores[s] = 0;
       }
 
-      // 若有真實/快取數據
       for (let s = 1; s <= 40; s++) {
         const studentRecords = localScoresHistory.filter(i => i.grade === currentUser.grade && i.seat_no === s);
         
-        // 49 個常規關卡最高分加總
+        // 49 個常規關卡最高分加總 (轉為 String 比對型態)
         for (let l = 1; l <= 49; l++) {
-          const lScores = studentRecords.filter(i => i.level === l).map(i => i.score);
+          const lScores = studentRecords.filter(i => String(i.level) === String(l)).map(i => i.score);
           if (lScores.length > 0) studentTotalScores[s] += Math.max(...lScores);
         }
 
         // 16 個總測驗最高分加總
         for (let r = 1; r <= 16; r++) {
           const rKey = `Review_${r}`;
-          const rScores = studentRecords.filter(i => i.level === rKey).map(i => i.score);
+          const rScores = studentRecords.filter(i => String(i.level) === String(rKey)).map(i => i.score);
           if (rScores.length > 0) studentTotalScores[s] += Math.max(...rScores);
         }
       }
@@ -1226,6 +1237,11 @@
         completed_at: new Date().toISOString()
       };
 
+      // 1. 立刻同步寫入本地快取，確保排行榜零時差即時更新
+      localScoresHistory.push(scoreData);
+      saveLocalScores();
+
+      // 2. 上傳至 Firebase Realtime Database
       if (db) {
         db.ref('scores').push(scoreData).then(() => {
           db.ref(`students/${currentUser.grade}/${currentUser.seat}/unlocked_level`).set(currentUser.unlockedLevel);
