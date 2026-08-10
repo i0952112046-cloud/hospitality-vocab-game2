@@ -792,22 +792,32 @@
       currentUser.grade = grade;
       currentUser.seat = seat;
       
-      localStorage.setItem('vocab_user_grade', grade);
-      localStorage.setItem('vocab_user_seat', seat);
-      
-      document.getElementById('login-modal').style.display = 'none';
-      
       try {
-        updateUserUI();
-        renderLevelGrid();
-      } catch(err) {
-        console.error("更新闖關地圖發生錯誤：", err);
-      }
+        localStorage.setItem('vocab_user_grade', grade);
+        localStorage.setItem('vocab_user_seat', seat);
+      } catch(e) {}
+
+      // 零時差立即關閉登入彈窗
+      const modal = document.getElementById('login-modal');
+      if (modal) modal.style.display = 'none';
+      
+      updateUserUI();
+
+      // 非同步極速渲染關卡網格，防止畫面卡頓
+      setTimeout(() => {
+        try {
+          renderLevelGrid();
+        } catch(err) {
+          console.error("更新闖關地圖發生錯誤：", err);
+        }
+      }, 0);
     }
 
     function switchUser() {
-      localStorage.removeItem('vocab_user_grade');
-      localStorage.removeItem('vocab_user_seat');
+      try {
+        localStorage.removeItem('vocab_user_grade');
+        localStorage.removeItem('vocab_user_seat');
+      } catch(e) {}
       document.getElementById('login-modal').style.display = 'flex';
     }
 
@@ -818,7 +828,6 @@
     }
 
     function getLevelStats(levelKey) {
-      loadLocalScores();
       if (!Array.isArray(localScoresHistory)) localScoresHistory = [];
       const records = localScoresHistory.filter(i => i && i.grade === currentUser.grade && String(i.level) === String(levelKey));
       
@@ -850,6 +859,7 @@
     }
 
     function renderLevelGrid() {
+      loadLocalScores(); // 僅在開始渲染地圖時讀取一次本地數據，極速流暢
       const grid = document.getElementById('level-grid-container');
       grid.innerHTML = '';
 
