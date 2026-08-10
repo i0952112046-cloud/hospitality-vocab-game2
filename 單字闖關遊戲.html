@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>專二餐服 雲端單字闖關遊戲 (含15+1階段總測驗)</title>
+  <title>專二餐服 雲端單字闖關遊戲 (含三合一排行榜)</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,8 +14,8 @@
   <style>
     :root {
       --bg-dark: #0f172a;
-      --card-bg: rgba(30, 41, 59, 0.7);
-      --card-border: rgba(255, 255, 255, 0.1);
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --card-border: rgba(255, 255, 255, 0.12);
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --accent-cyan: #06b6d4;
@@ -25,7 +25,7 @@
       --accent-purple: #a855f7;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
     }
 
     * {
@@ -91,6 +91,8 @@
       border-radius: 14px;
       padding: 12px 20px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .user-info {
@@ -128,6 +130,14 @@
     .btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+    .btn-gold:hover {
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
     }
 
     .btn-secondary {
@@ -172,7 +182,6 @@
     .level-card.review-card {
       background: linear-gradient(135deg, rgba(88, 28, 135, 0.4), rgba(30, 41, 59, 0.8));
       border: 2px solid var(--accent-purple);
-      grid-column: span 1;
     }
     .level-card.review-card:hover:not(.locked) {
       border-color: var(--accent-amber);
@@ -206,11 +215,6 @@
       border-radius: 6px;
       font-weight: 600;
     }
-    .review-card .page-tag {
-      background: rgba(245, 158, 11, 0.2);
-      color: var(--accent-amber);
-      border-color: rgba(245, 158, 11, 0.4);
-    }
 
     .level-title {
       font-size: 0.95rem;
@@ -230,18 +234,20 @@
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(2, 6, 23, 0.85);
-      backdrop-filter: blur(8px);
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 100;
+      z-index: 1000;
       padding: 20px;
     }
 
     .modal-content {
       width: 100%;
-      max-width: 420px;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .form-group {
@@ -264,10 +270,6 @@
       color: white;
       font-size: 1rem;
       outline: none;
-    }
-
-    .form-control:focus {
-      border-color: var(--primary);
     }
 
     /* Game Screen */
@@ -379,14 +381,46 @@
       40%, 80% { transform: translateX(6px); }
     }
 
-    /* Result Modal */
-    .result-score {
-      font-family: 'Outfit', sans-serif;
-      font-size: 3.5rem;
-      font-weight: 800;
-      color: var(--accent-amber);
-      margin: 10px 0;
+    /* Leaderboard Component Styling */
+    .rank-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 14px;
+      text-align: left;
     }
+
+    .rank-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+    }
+
+    .rank-item.my-rank {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(6, 182, 212, 0.25));
+      border-color: var(--accent-cyan);
+    }
+
+    .rank-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .rank-1 { background: #f59e0b; color: #78350f; }
+    .rank-2 { background: #94a3b8; color: #1e293b; }
+    .rank-3 { background: #b45309; color: #fff; }
+    .rank-other { background: rgba(255,255,255,0.1); color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -418,10 +452,10 @@
     <!-- Header -->
     <header>
       <h1>專二餐服 雲端單字闖關遊戲</h1>
-      <p>49個常規雙頁關卡 + 15+1個階段總測驗 (每3關乙次總測驗，最後4關乙次大會考)</p>
+      <p>49個常規雙頁關卡 + 15+1個階段總測驗 ｜ 三合一即時英雄排行榜</p>
     </header>
 
-    <!-- User Status -->
+    <!-- User Status Bar -->
     <div class="user-status-bar">
       <div class="user-info">
         <div class="avatar" id="display-avatar">?</div>
@@ -430,7 +464,8 @@
           <div style="font-size: 0.8rem; color: var(--text-muted);" id="display-unlocked">最高關卡: Level 1</div>
         </div>
       </div>
-      <div>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-gold" onclick="openGlobalLeaderboard()"><i class="fa-solid fa-trophy"></i> 全級總積分榜</button>
         <button class="btn btn-secondary" onclick="switchUser()"><i class="fa-solid fa-right-from-bracket"></i> 切換帳號</button>
       </div>
     </div>
@@ -474,15 +509,59 @@
       </div>
     </div>
 
-    <!-- Result Modal -->
+    <!-- Result Modal with Per-Level / Review Leaderboard -->
     <div id="result-modal" class="modal-overlay" style="display: none;">
       <div class="glass-card modal-content" style="text-align: center;">
         <h2 id="result-title" style="font-family: 'Outfit';">闖關成功！ 🎉</h2>
         <div class="result-score" id="result-score-val">90分</div>
-        <p id="result-desc" style="color: var(--text-muted); margin-bottom: 20px;">恭喜通過本關卡，已成功解鎖下一關！</p>
-        <button class="btn" style="width: 100%; justify-content: center;" onclick="closeResultModal()">
+        <p id="result-desc" style="color: var(--text-muted); margin-bottom: 16px;">恭喜通過本關卡，已成功解鎖下一關！</p>
+
+        <!-- 即時名次卡片 -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--accent-amber); border-radius: 12px; padding: 12px; margin-bottom: 16px;">
+          <div style="font-size: 0.9rem; color: var(--text-muted);">你在 <span id="rank-grade-text">2</span> 年級當關即時排名</div>
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent-amber);" id="rank-position-text">第 1 名</div>
+        </div>
+
+        <!-- 當關 Top 5 榜單 -->
+        <h4 style="text-align: left; font-size: 0.9rem; color: var(--accent-cyan); margin-bottom: 8px;"><i class="fa-solid fa-medal"></i> 當關同級英雄榜 Top 5</h4>
+        <div class="rank-list" id="result-top5-list">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <button class="btn" style="width: 100%; justify-content: center; margin-top: 20px;" onclick="closeResultModal()">
           <i class="fa-solid fa-check"></i> 確定並返回關卡地圖
         </button>
+      </div>
+    </div>
+
+    <!-- Global Points Leaderboard Modal -->
+    <div id="global-rank-modal" class="modal-overlay" style="display: none;">
+      <div class="glass-card modal-content" style="max-width: 540px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-family: 'Outfit'; font-size: 1.3rem; color: var(--accent-amber);"><i class="fa-solid fa-trophy"></i> 目前全級積分總排行榜</h3>
+          <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="closeGlobalLeaderboard()"><i class="fa-solid fa-xmark"></i> 關閉</button>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); text-align: left; margin-bottom: 14px;">
+          累計 49 個常規關卡與 16 個階段總測驗之最高得分加總名次（最高 6500 分）：
+        </p>
+
+        <!-- Current User Rank Banner -->
+        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(6, 182, 212, 0.3)); border: 1px solid var(--accent-cyan); border-radius: 14px; padding: 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="text-align: left;">
+            <div style="font-size: 0.8rem; color: var(--text-muted);">我的當前總積分名次</div>
+            <div style="font-size: 1.3rem; font-weight: 800; color: white;" id="my-global-rank-text">第 -- 名</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.8rem; color: var(--text-muted);">累積總積分</div>
+            <div style="font-size: 1.3rem; font-weight: 800; color: var(--accent-amber);" id="my-global-score-text">0 分</div>
+          </div>
+        </div>
+
+        <!-- Leaderboard List -->
+        <div class="rank-list" id="global-rank-list" style="max-height: 360px; overflow-y: auto;">
+          <!-- 1~40 seat leaderboard rendered dynamically -->
+        </div>
       </div>
     </div>
 
@@ -506,13 +585,27 @@
     };
 
     let db = null;
+    let localScoresHistory = []; // 本地/雲端成績快取紀錄
+
     try {
       if (firebase.apps.length === 0) {
         firebase.initializeApp(firebaseConfig);
       }
       db = firebase.database();
+      listenGlobalScores();
     } catch(e) {
       console.warn("Firebase 處於本地離線測試模式。");
+    }
+
+    function listenGlobalScores() {
+      if (db) {
+        db.ref('scores').on('value', snapshot => {
+          const val = snapshot.val();
+          if (val) {
+            localScoresHistory = Object.values(val);
+          }
+        });
+      }
     }
 
     // 專二餐服單字題庫數據
@@ -715,7 +808,6 @@
       document.getElementById('display-unlocked').innerText = `最高解鎖關卡: Level ${currentUser.unlockedLevel}`;
     }
 
-    // 繪製 49 關卡地圖 + 15+1 個階段總測驗卡片
     function renderLevelGrid() {
       const grid = document.getElementById('level-grid-container');
       grid.innerHTML = '';
@@ -728,14 +820,11 @@
         const pageLabel = `P.${startP}~P.${endP}`;
 
         const levelData = VOCAB_DATA.find(l => l.level === i) || {
-          level: i,
-          name: `進階餐旅單字關卡 ${i}`,
-          words: VOCAB_DATA[0].words
+          level: i, name: `進階餐旅單字關卡 ${i}`, words: VOCAB_DATA[0].words
         };
 
         const isLocked = i > currentUser.unlockedLevel;
 
-        // 1. 產生常規關卡卡片
         const card = document.createElement('div');
         card.className = `level-card ${isLocked ? 'locked' : ''}`;
         card.innerHTML = `
@@ -756,15 +845,12 @@
 
         grid.appendChild(card);
 
-        // 2. 每 3 關（1~45關）插入 1 個階段總測驗卡片
         if (i % 3 === 0 && i <= 45) {
           const reviewId = reviewCounter;
           const rStartLvl = i - 2;
           const rEndLvl = i;
           const rStartP = 3 + (rStartLvl - 1) * 2;
           const rEndP = 4 + (rEndLvl - 1) * 2;
-
-          // 總測驗解鎖條件：前 3 關皆已解鎖
           const isReviewLocked = i > currentUser.unlockedLevel;
 
           const rCard = document.createElement('div');
@@ -789,7 +875,6 @@
           reviewCounter++;
         }
 
-        // 3. 第 49 關之後插入第 16 個總測驗（最後 4 關總大會考）
         if (i === 49) {
           const reviewId = 16;
           const rStartLvl = 46;
@@ -820,7 +905,6 @@
       }
     }
 
-    // 開始常規關卡
     function startLevel(levelNum, startP, endP) {
       const levelData = VOCAB_DATA.find(l => l.level === levelNum) || {
         level: levelNum, name: `進階餐旅單字關卡 ${levelNum}`, words: VOCAB_DATA[0].words
@@ -856,7 +940,6 @@
       showCurrentQuestion();
     }
 
-    // 開始階段總測驗 (15+1)
     function startReviewTest(reviewId, startLvl, endLvl, startP, endP) {
       currentGame.isReview = true;
       currentGame.reviewId = reviewId;
@@ -865,7 +948,6 @@
       currentGame.score = 0;
       currentGame.correctCount = 0;
 
-      // 混合這幾關的所有單字
       let poolWords = [];
       for (let l = startLvl; l <= endLvl; l++) {
         const lData = VOCAB_DATA.find(item => item.level === l);
@@ -874,7 +956,7 @@
       }
 
       shuffleArray(poolWords);
-      const sampled = poolWords.slice(0, 25); // 總測驗抽樣 25 題
+      const sampled = poolWords.slice(0, 25);
 
       currentGame.questions = sampled.map(target => {
         const otherWords = poolWords.filter(w => w.en !== target.en);
@@ -981,9 +1063,148 @@
         document.getElementById('result-desc').innerText = `本次得分 ${finalScore} 分，未達 85 分及格標準，請再次挑戰！`;
       }
 
-      submitScoreToFirebase(currentGame.isReview ? `Review_${currentGame.reviewId}` : currentGame.level, finalScore);
+      const targetLevelKey = currentGame.isReview ? `Review_${currentGame.reviewId}` : currentGame.level;
+      submitScoreToFirebase(targetLevelKey, finalScore);
+      
+      // 計算並繪製當關 Top 5 英雄榜與即時名次
+      renderPerLevelRankings(targetLevelKey, finalScore);
       updateUserUI();
       renderLevelGrid();
+    }
+
+    function renderPerLevelRankings(levelKey, currentScore) {
+      document.getElementById('rank-grade-text').innerText = currentUser.grade;
+
+      // 提取同年級、當關最高分
+      const gradeScores = localScoresHistory.filter(item => item.grade === currentUser.grade && item.level == levelKey);
+      
+      // 加入當前成績
+      gradeScores.push({
+        grade: currentUser.grade,
+        seat_no: currentUser.seat,
+        level: levelKey,
+        score: currentScore
+      });
+
+      // 每個座號保留最高得分
+      const seatBest = {};
+      gradeScores.forEach(item => {
+        if (!seatBest[item.seat_no] || item.score > seatBest[item.seat_no]) {
+          seatBest[item.seat_no] = item.score;
+        }
+      });
+
+      const sorted = Object.keys(seatBest).map(seat => ({
+        seat: parseInt(seat),
+        score: seatBest[seat]
+      })).sort((a, b) => b.score - a.score);
+
+      // 計算目前座號名次
+      const myRankIndex = sorted.findIndex(s => s.seat === currentUser.seat);
+      const myRankNumber = myRankIndex >= 0 ? myRankIndex + 1 : 1;
+      document.getElementById('rank-position-text').innerText = `第 ${myRankNumber} 名`;
+
+      // 繪製 Top 5
+      const top5Container = document.getElementById('result-top5-list');
+      top5Container.innerHTML = '';
+
+      const top5 = sorted.slice(0, 5);
+      top5.forEach((item, idx) => {
+        const rankNum = idx + 1;
+        let badgeClass = 'rank-other';
+        let badgeIcon = rankNum;
+
+        if (rankNum === 1) { badgeClass = 'rank-1'; badgeIcon = '🥇'; }
+        else if (rankNum === 2) { badgeClass = 'rank-2'; badgeIcon = '🥈'; }
+        else if (rankNum === 3) { badgeClass = 'rank-3'; badgeIcon = '🥉'; }
+
+        const isMe = item.seat === currentUser.seat;
+
+        const row = document.createElement('div');
+        row.className = `rank-item ${isMe ? 'my-rank' : ''}`;
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="rank-badge ${badgeClass}">${badgeIcon}</div>
+            <span style="font-weight:600;">${currentUser.grade} 年級 ${item.seat} 號 ${isMe ? '(你)' : ''}</span>
+          </div>
+          <div style="font-weight:700; color:var(--accent-amber);">${item.score} 分</div>
+        `;
+        top5Container.appendChild(row);
+      });
+    }
+
+    // 開啟全級總積分排行榜 Modal
+    function openGlobalLeaderboard() {
+      document.getElementById('global-rank-modal').style.display = 'flex';
+      renderGlobalLeaderboard();
+    }
+
+    function closeGlobalLeaderboard() {
+      document.getElementById('global-rank-modal').style.display = 'none';
+    }
+
+    function renderGlobalLeaderboard() {
+      const container = document.getElementById('global-rank-list');
+      container.innerHTML = '';
+
+      // 統計 1~40 座號在 49個常規關卡 + 16個總測驗的最高得分加總
+      const studentTotalScores = {};
+      for (let s = 1; s <= 40; s++) {
+        studentTotalScores[s] = 0;
+      }
+
+      // 若有真實/快取數據
+      for (let s = 1; s <= 40; s++) {
+        const studentRecords = localScoresHistory.filter(i => i.grade === currentUser.grade && i.seat_no === s);
+        
+        // 49 個常規關卡最高分加總
+        for (let l = 1; l <= 49; l++) {
+          const lScores = studentRecords.filter(i => i.level === l).map(i => i.score);
+          if (lScores.length > 0) studentTotalScores[s] += Math.max(...lScores);
+        }
+
+        // 16 個總測驗最高分加總
+        for (let r = 1; r <= 16; r++) {
+          const rKey = `Review_${r}`;
+          const rScores = studentRecords.filter(i => i.level === rKey).map(i => i.score);
+          if (rScores.length > 0) studentTotalScores[s] += Math.max(...rScores);
+        }
+      }
+
+      const sortedGlobal = Object.keys(studentTotalScores).map(seat => ({
+        seat: parseInt(seat),
+        totalScore: studentTotalScores[seat]
+      })).sort((a, b) => b.totalScore - a.totalScore);
+
+      const myRankIndex = sortedGlobal.findIndex(s => s.seat === currentUser.seat);
+      const myRankNumber = myRankIndex >= 0 ? myRankIndex + 1 : 1;
+      const myTotalScore = studentTotalScores[currentUser.seat] || 0;
+
+      document.getElementById('my-global-rank-text').innerText = `第 ${myRankNumber} 名 / 共 40 人`;
+      document.getElementById('my-global-score-text').innerText = `${myTotalScore} 分`;
+
+      sortedGlobal.forEach((item, idx) => {
+        const rankNum = idx + 1;
+        let badgeClass = 'rank-other';
+        let badgeIcon = rankNum;
+
+        if (rankNum === 1) { badgeClass = 'rank-1'; badgeIcon = '🥇'; }
+        else if (rankNum === 2) { badgeClass = 'rank-2'; badgeIcon = '🥈'; }
+        else if (rankNum === 3) { badgeClass = 'rank-3'; badgeIcon = '🥉'; }
+
+        const isMe = item.seat === currentUser.seat;
+
+        const row = document.createElement('div');
+        row.className = `rank-item ${isMe ? 'my-rank' : ''}`;
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="rank-badge ${badgeClass}">${badgeIcon}</div>
+            <span style="font-weight:600;">${currentUser.grade} 年級 ${item.seat} 號 ${isMe ? '(你)' : ''}</span>
+          </div>
+          <div style="font-weight:700; color:var(--accent-amber);">${item.totalScore} 分</div>
+        `;
+        container.appendChild(row);
+      });
     }
 
     function closeResultModal() {

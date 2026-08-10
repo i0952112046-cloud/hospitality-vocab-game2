@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>專二餐服 教師即時後台管理系統 (含15+1階段總測驗)</title>
+  <title>專二餐服 教師即時後台管理系統 (含總積分排行榜)</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -257,10 +257,10 @@
     <div class="header-bar">
       <div>
         <h1>專二餐服 教師即時後台管理系統 <span style="font-size:0.9rem; font-weight:normal; color:var(--accent-emerald);"><i class="fa-solid fa-shield-halved"></i> 已授權驗證</span></h1>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">49個雙頁常規關卡 + 15+1階段總測驗進度即時監控</p>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">49個常規關卡 + 15+1階段總測驗 ｜ 學生積分排行榜監控</p>
       </div>
       <div style="display: flex; gap: 12px;">
-        <button class="btn btn-emerald" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> 匯出全班 Excel 報表 (含15+1總測驗)</button>
+        <button class="btn btn-emerald" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> 匯出全班 Excel 報表 (含總積分與排名)</button>
         <button class="btn" style="background: rgba(255,255,255,0.1);" onclick="generateMockData()"><i class="fa-solid fa-wand-magic-sparkles"></i> 載入模擬測試數據</button>
         <button class="btn" style="background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4);" onclick="logoutTeacher()"><i class="fa-solid fa-lock"></i> 鎖定登出</button>
       </div>
@@ -272,18 +272,18 @@
         <div class="stat-val" id="stat-total-students">80 人</div>
       </div>
       <div class="stat-card">
-        <span style="font-size: 0.85rem; color: var(--text-muted);">常規關卡平均進度</span>
-        <div class="stat-val" id="stat-avg-progress" style="color: var(--accent-emerald);">0%</div>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">全級最高累積總積分</span>
+        <div class="stat-val" id="stat-max-score" style="color: var(--accent-amber);">0 分</div>
       </div>
       <div class="stat-card">
         <span style="font-size: 0.85rem; color: var(--text-muted);">已完成 49 關全通關</span>
-        <div class="stat-val" id="stat-completed-count" style="color: var(--accent-amber);">0 人</div>
+        <div class="stat-val" id="stat-completed-count" style="color: var(--accent-emerald);">0 人</div>
       </div>
     </div>
 
     <div class="glass-card">
       <div class="tab-group">
-        <button class="tab-btn active" id="tab-overview" onclick="switchView('overview')"><i class="fa-solid fa-chart-pie"></i> 學生進度總覽模式</button>
+        <button class="tab-btn active" id="tab-overview" onclick="switchView('overview')"><i class="fa-solid fa-chart-pie"></i> 學生進度與總積分榜</button>
         <button class="tab-btn" id="tab-level" onclick="switchView('level')"><i class="fa-solid fa-layer-group"></i> 單關 / 總測驗詳細檢視</button>
       </div>
 
@@ -387,12 +387,10 @@
       generateMockData();
     }
 
-    // 動態加入 49 關常規關卡 + 16 個階段總測驗選項
     function initLevelSelectOptions() {
       const sel = document.getElementById('select-level-inspect');
       sel.innerHTML = '';
 
-      // 1. 常規關卡 1~49
       const optGroupLevels = document.createElement('optgroup');
       optGroupLevels.label = '常規關卡 (Level 1~49)';
       for (let i = 1; i <= 49; i++) {
@@ -405,7 +403,6 @@
       }
       sel.appendChild(optGroupLevels);
 
-      // 2. 階段總測驗 1~16
       const optGroupReviews = document.createElement('optgroup');
       optGroupReviews.label = '⚔️ 階段總測驗 (15+1個)';
 
@@ -420,7 +417,6 @@
         optGroupReviews.appendChild(opt);
       }
 
-      // 第 16 個總測驗
       const opt16 = document.createElement('option');
       opt16.value = `Review_16`;
       opt16.innerText = `👑 期末總大會考 16 (涵蓋 Level 46~49 | P.93~P.100)`;
@@ -464,75 +460,109 @@
 
       thead.innerHTML = `
         <tr>
+          <th>全級總名次</th>
           <th>年級</th>
           <th>座號</th>
-          <th>最高解鎖常規關卡</th>
+          <th>累積總積分 (最高6500)</th>
+          <th>最高解鎖關卡</th>
           <th>常規完成度 (% / 49關)</th>
           <th>已通過總測驗數 (% / 16次)</th>
-          <th>狀態</th>
         </tr>
       `;
 
       tbody.innerHTML = '';
 
-      let totalStudents = 0;
-      let sumUnlocked = 0;
+      let studentList = [];
+      let totalStudentsCount = 0;
       let completedCount = 0;
+      let maxScoreFound = 0;
 
       for (let g of [2, 3]) {
         if (gradeFilter !== 'all' && parseInt(gradeFilter) !== g) continue;
 
         for (let s = 1; s <= 40; s++) {
-          totalStudents++;
+          totalStudentsCount++;
           const studentScores = scoresData.filter(item => item.grade === g && item.seat_no === s);
           
-          // 常規關卡通關數
-          const passedRegularLevels = new Set(
-            studentScores.filter(i => typeof i.level === 'number' && i.score >= 85).map(i => i.level)
-          );
+          let totalPts = 0;
+
+          // 計算 49 常規關卡最高得分加總
+          const passedRegularLevels = new Set();
+          for (let l = 1; l <= 49; l++) {
+            const lScores = studentScores.filter(i => i.level === l).map(i => i.score);
+            if (lScores.length > 0) {
+              const maxS = Math.max(...lScores);
+              totalPts += maxS;
+              if (maxS >= 85) passedRegularLevels.add(l);
+            }
+          }
+
+          // 計算 16 個總測驗最高得分加總
+          const passedReviews = new Set();
+          for (let r = 1; r <= 16; r++) {
+            const rKey = `Review_${r}`;
+            const rScores = studentScores.filter(i => i.level === rKey).map(i => i.score);
+            if (rScores.length > 0) {
+              const maxS = Math.max(...rScores);
+              totalPts += maxS;
+              if (maxS >= 85) passedReviews.add(rKey);
+            }
+          }
+
+          if (totalPts > maxScoreFound) maxScoreFound = totalPts;
+
           const maxUnlocked = Math.min(49, passedRegularLevels.size + 1);
-
-          // 總測驗通關數 (Review_1 ~ Review_16)
-          const passedReviews = new Set(
-            studentScores.filter(i => typeof i.level === 'string' && i.level.startsWith('Review_') && i.score >= 85).map(i => i.level)
-          );
-
-          sumUnlocked += maxUnlocked;
           if (maxUnlocked >= 49) completedCount++;
 
-          const pctRegular = Math.round((passedRegularLevels.size / 49) * 100);
-          const reviewPct = Math.round((passedReviews.size / 16) * 100);
-          const startP = 3 + (maxUnlocked - 1) * 2;
-          const endP = startP + 1;
-
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td><b style="color:var(--accent-cyan);">${g} 年級</b></td>
-            <td>${s} 號</td>
-            <td><span style="font-weight:700;">Level ${maxUnlocked}</span> (P.${startP}~P.${endP})</td>
-            <td>
-              <div style="display:flex; align-items:center; gap:12px;">
-                <div class="progress-bar" style="width:120px;">
-                  <div class="progress-fill" style="width:${pctRegular}%;"></div>
-                </div>
-                <span>${pctRegular}%</span>
-              </div>
-            </td>
-            <td>
-              <span style="color:var(--accent-amber); font-weight:700;">${passedReviews.size} / 16 關</span> (${reviewPct}%)
-            </td>
-            <td>
-              <span class="badge ${passedRegularLevels.size >= 49 ? 'badge-pass' : 'badge-fail'}">
-                ${passedRegularLevels.size >= 49 ? '常規全通關 🏆' : '闖關中'}
-              </span>
-            </td>
-          `;
-          tbody.appendChild(tr);
+          studentList.push({
+            grade: g,
+            seat: s,
+            totalPoints: totalPts,
+            maxUnlocked: maxUnlocked,
+            passedRegularCount: passedRegularLevels.size,
+            passedReviewCount: passedReviews.size
+          });
         }
       }
 
-      document.getElementById('stat-total-students').innerText = `${totalStudents} 人`;
-      document.getElementById('stat-avg-progress').innerText = `${totalStudents ? Math.round(((sumUnlocked / totalStudents) / 49) * 100) : 0}%`;
+      // 按總積分高低排序名次
+      studentList.sort((a, b) => b.totalPoints - a.totalPoints);
+
+      studentList.forEach((st, idx) => {
+        const rank = idx + 1;
+        const pctRegular = Math.round((st.passedRegularCount / 49) * 100);
+        const reviewPct = Math.round((st.passedReviewCount / 16) * 100);
+
+        let rankBadge = rank;
+        if (rank === 1) rankBadge = '🥇 第1名';
+        else if (rank === 2) rankBadge = '🥈 第2名';
+        else if (rank === 3) rankBadge = '🥉 第3名';
+        else rankBadge = `第 ${rank} 名`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><b style="color:${rank <= 3 ? 'var(--accent-amber)' : 'var(--text-muted)'};">${rankBadge}</b></td>
+          <td><b style="color:var(--accent-cyan);">${st.grade} 年級</b></td>
+          <td>${st.seat} 號</td>
+          <td><b style="font-size:1.1rem; color:var(--accent-amber);">${st.totalPoints} 分</b></td>
+          <td><span style="font-weight:700;">Level ${st.maxUnlocked}</span></td>
+          <td>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div class="progress-bar" style="width:100px;">
+                <div class="progress-fill" style="width:${pctRegular}%;"></div>
+              </div>
+              <span>${pctRegular}%</span>
+            </div>
+          </td>
+          <td>
+            <span style="color:var(--accent-amber); font-weight:700;">${st.passedReviewCount} / 16 關</span> (${reviewPct}%)
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('stat-total-students').innerText = `${totalStudentsCount} 人`;
+      document.getElementById('stat-max-score').innerText = `${maxScoreFound} 分`;
       document.getElementById('stat-completed-count').innerText = `${completedCount} 人`;
     }
 
@@ -587,63 +617,76 @@
       }
     }
 
-    // 匯出包含 49 關常規分數 + 16 個總測驗最高分之完整 Excel 報表
     function exportToExcel() {
       const matrix = [];
-      const header = ["年級", "座號", "常規完成關卡數", "常規進度(%)", "已通過總測驗數"];
+      const header = ["全級總名次", "年級", "座號", "累積總積分(最高6500)", "常規完成關卡數", "常規進度(%)", "已通過總測驗數"];
       
-      // 加入常規關卡欄位
       for (let i = 1; i <= 49; i++) {
         const startP = 3 + (i - 1) * 2;
         const endP = startP + 1;
         header.push(`Level_${i}_(P.${startP}-P.${endP})`);
       }
 
-      // 加入 16 個階段總測驗欄位
       for (let r = 1; r <= 16; r++) {
         header.push(`階段總測驗_${r}_最高分`);
       }
 
       matrix.push(header);
 
+      let studentList = [];
+
       for (let g of [2, 3]) {
         for (let s = 1; s <= 40; s++) {
           const studentScores = scoresData.filter(item => item.grade === g && item.seat_no === s);
           
-          const passedRegularCount = new Set(
-            studentScores.filter(i => typeof i.level === 'number' && i.score >= 85).map(i => i.level)
-          ).size;
+          let totalPts = 0;
+          const regScoresObj = {};
+          const revScoresObj = {};
 
-          const passedReviewCount = new Set(
-            studentScores.filter(i => typeof i.level === 'string' && i.level.startsWith('Review_') && i.score >= 85).map(i => i.level)
-          ).size;
-
-          const pct = Math.round((passedRegularCount / 49) * 100);
-
-          const row = [g, s, passedRegularCount, `${pct}%`, `${passedReviewCount} / 16`];
-
-          // 填入 49 關最高分
+          const passedRegularCount = new Set();
           for (let i = 1; i <= 49; i++) {
-            const levelScores = studentScores.filter(item => item.level === i).map(item => item.score);
-            row.push(levelScores.length > 0 ? Math.max(...levelScores) : 0);
+            const lScores = studentScores.filter(item => item.level === i).map(item => item.score);
+            const maxS = lScores.length > 0 ? Math.max(...lScores) : 0;
+            regScoresObj[i] = maxS;
+            totalPts += maxS;
+            if (maxS >= 85) passedRegularCount.add(i);
           }
 
-          // 填入 16 個總測驗最高分
+          const passedReviewCount = new Set();
           for (let r = 1; r <= 16; r++) {
             const revKey = `Review_${r}`;
-            const revScores = studentScores.filter(item => item.level === revKey).map(item => item.score);
-            row.push(revScores.length > 0 ? Math.max(...revScores) : 0);
+            const rScores = studentScores.filter(item => item.level === revKey).map(item => item.score);
+            const maxS = rScores.length > 0 ? Math.max(...rScores) : 0;
+            revScoresObj[r] = maxS;
+            totalPts += maxS;
+            if (maxS >= 85) passedReviewCount.add(revKey);
           }
 
-          matrix.push(row);
+          const pct = Math.round((passedRegularCount.size / 49) * 100);
+
+          studentList.push({
+            grade: g, seat: s, totalPts: totalPts,
+            passedReg: passedRegularCount.size, pctStr: `${pct}%`,
+            passedRev: `${passedReviewCount.size} / 16`,
+            regScores: regScoresObj, revScores: revScoresObj
+          });
         }
       }
 
+      studentList.sort((a, b) => b.totalPts - a.totalPts);
+
+      studentList.forEach((st, idx) => {
+        const row = [idx + 1, st.grade, st.seat, st.totalPts, st.passedReg, st.pctStr, st.passedRev];
+        for (let i = 1; i <= 49; i++) row.push(st.regScores[i]);
+        for (let r = 1; r <= 16; r++) row.push(st.revScores[r]);
+        matrix.push(row);
+      });
+
       const ws = XLSX.utils.aoa_to_sheet(matrix);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "專二餐服單字成績總表");
+      XLSX.utils.book_append_sheet(wb, ws, "專二餐服單字與總積分總表");
 
-      XLSX.writeFile(wb, "專二餐服_雲端單字闖關與15+1總測驗全班成績總表.xlsx");
+      XLSX.writeFile(wb, "專二餐服_雲端單字闖關全班總積分排行榜成績總表.xlsx");
     }
 
     function generateMockData() {
@@ -660,7 +703,6 @@
               completed_at: new Date(now.getTime() - Math.random() * 86400000 * 5).toISOString()
             });
 
-            // 模擬總測驗數據
             if (l % 3 === 0) {
               const rId = l / 3;
               scoresData.push({
