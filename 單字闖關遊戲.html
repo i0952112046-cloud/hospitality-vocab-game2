@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>專二餐服 雲端單字闖關遊戲</title>
+  <title>專二餐服 雲端單字闖關遊戲 (含15+1階段總測驗)</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,7 @@
       --accent-pink: #ec4899;
       --accent-emerald: #10b981;
       --accent-amber: #f59e0b;
+      --accent-purple: #a855f7;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
@@ -29,8 +30,7 @@
 
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
@@ -46,7 +46,7 @@
 
     .container {
       width: 100%;
-      max-width: 900px;
+      max-width: 960px;
     }
 
     header {
@@ -58,7 +58,7 @@
       font-family: 'Outfit', sans-serif;
       font-size: 2.2rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #a5b4fc, #38bdf8, #818cf8);
+      background: linear-gradient(135deg, #a5b4fc, #38bdf8, #f472b6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 6px;
@@ -79,7 +79,6 @@
       padding: 24px;
       box-shadow: var(--glass-shadow);
       margin-bottom: 24px;
-      transition: transform 0.2s ease;
     }
 
     /* User Status Bar */
@@ -142,7 +141,7 @@
     /* Level Grid */
     .level-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 18px;
     }
 
@@ -169,6 +168,17 @@
       filter: grayscale(0.6);
     }
 
+    /* Special Review Card Styling (總測驗卡片) */
+    .level-card.review-card {
+      background: linear-gradient(135deg, rgba(88, 28, 135, 0.4), rgba(30, 41, 59, 0.8));
+      border: 2px solid var(--accent-purple);
+      grid-column: span 1;
+    }
+    .level-card.review-card:hover:not(.locked) {
+      border-color: var(--accent-amber);
+      box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.5);
+    }
+
     .level-header {
       display: flex;
       justify-content: space-between;
@@ -183,6 +193,10 @@
       color: var(--accent-cyan);
     }
 
+    .review-card .level-number {
+      color: var(--accent-amber);
+    }
+
     .page-tag {
       font-size: 0.78rem;
       background: rgba(99, 102, 241, 0.25);
@@ -192,14 +206,10 @@
       border-radius: 6px;
       font-weight: 600;
     }
-
-    .level-badge {
-      font-size: 0.8rem;
-      padding: 4px 8px;
-      border-radius: 8px;
-      background: rgba(16, 185, 129, 0.2);
-      color: var(--accent-emerald);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+    .review-card .page-tag {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--accent-amber);
+      border-color: rgba(245, 158, 11, 0.4);
     }
 
     .level-title {
@@ -408,7 +418,7 @@
     <!-- Header -->
     <header>
       <h1>專二餐服 雲端單字闖關遊戲</h1>
-      <p>從課本第 3 頁開始，每 2 頁劃分為一個關卡 (Level 1 = P.3~P.4, Level 2 = P.5~P.6...)</p>
+      <p>49個常規雙頁關卡 + 15+1個階段總測驗 (每3關乙次總測驗，最後4關乙次大會考)</p>
     </header>
 
     <!-- User Status -->
@@ -429,7 +439,7 @@
     <div id="level-screen">
       <div class="glass-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h2 style="font-size: 1.25rem;"><i class="fa-solid fa-map-location-dot" style="color: var(--accent-cyan);"></i> 關卡地圖 (課本雙頁為一關，85分及格)</h2>
+          <h2 style="font-size: 1.25rem;"><i class="fa-solid fa-map-location-dot" style="color: var(--accent-cyan);"></i> 闖關地圖 (含 15+1 階段總測驗，85分及格)</h2>
           <span style="font-size: 0.85rem; color: var(--text-muted);">完成關卡自動解鎖下一關</span>
         </div>
         <div class="level-grid" id="level-grid-container">
@@ -502,10 +512,10 @@
       }
       db = firebase.database();
     } catch(e) {
-      console.warn("Firebase 未設定真實連線金鑰，將切換至本地 LocalStorage 離線模式。");
+      console.warn("Firebase 處於本地離線測試模式。");
     }
 
-    // 專二餐服單字題庫數據 (含頁碼標註)
+    // 專二餐服單字題庫數據
     const VOCAB_DATA = [
       {
         level: 1, startPage: 3, endPage: 4, name: "餐具與檯面基本用語",
@@ -640,7 +650,13 @@
     };
 
     let currentGame = {
-      level: 1, questions: [], currentIndex: 0, score: 0, correctCount: 0
+      isReview: false,
+      reviewId: null,
+      level: 1,
+      questions: [],
+      currentIndex: 0,
+      score: 0,
+      correctCount: 0
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -699,10 +715,12 @@
       document.getElementById('display-unlocked').innerText = `最高解鎖關卡: Level ${currentUser.unlockedLevel}`;
     }
 
-    // 繪製 49 關卡地圖卡片 (包含標註頁碼: 從第3頁開始，一關2頁)
+    // 繪製 49 關卡地圖 + 15+1 個階段總測驗卡片
     function renderLevelGrid() {
       const grid = document.getElementById('level-grid-container');
       grid.innerHTML = '';
+
+      let reviewCounter = 1;
 
       for (let i = 1; i <= 49; i++) {
         const startP = 3 + (i - 1) * 2;
@@ -717,6 +735,7 @@
 
         const isLocked = i > currentUser.unlockedLevel;
 
+        // 1. 產生常規關卡卡片
         const card = document.createElement('div');
         card.className = `level-card ${isLocked ? 'locked' : ''}`;
         card.innerHTML = `
@@ -736,17 +755,79 @@
         }
 
         grid.appendChild(card);
+
+        // 2. 每 3 關（1~45關）插入 1 個階段總測驗卡片
+        if (i % 3 === 0 && i <= 45) {
+          const reviewId = reviewCounter;
+          const rStartLvl = i - 2;
+          const rEndLvl = i;
+          const rStartP = 3 + (rStartLvl - 1) * 2;
+          const rEndP = 4 + (rEndLvl - 1) * 2;
+
+          // 總測驗解鎖條件：前 3 關皆已解鎖
+          const isReviewLocked = i > currentUser.unlockedLevel;
+
+          const rCard = document.createElement('div');
+          rCard.className = `level-card review-card ${isReviewLocked ? 'locked' : ''}`;
+          rCard.innerHTML = `
+            <div class="level-header">
+              <span class="level-number"><i class="fa-solid fa-trophy"></i> 總測驗 ${reviewId}</span>
+              <span class="page-tag">P.${rStartP}~P.${rEndP}</span>
+            </div>
+            <div class="level-title">⚔️ 前 3 關階段總測驗 (Level ${rStartLvl}~${rEndLvl})</div>
+            <div class="level-stats">
+              <span>25 題綜合抽樣</span>
+              <span>${isReviewLocked ? '<i class="fa-solid fa-lock"></i> 需通過Level ' + i : '<i class="fa-solid fa-shield-halved"></i> 開啟挑戰'}</span>
+            </div>
+          `;
+
+          if (!isReviewLocked) {
+            rCard.onclick = () => startReviewTest(reviewId, rStartLvl, rEndLvl, rStartP, rEndP);
+          }
+
+          grid.appendChild(rCard);
+          reviewCounter++;
+        }
+
+        // 3. 第 49 關之後插入第 16 個總測驗（最後 4 關總大會考）
+        if (i === 49) {
+          const reviewId = 16;
+          const rStartLvl = 46;
+          const rEndLvl = 49;
+          const isReviewLocked = currentUser.unlockedLevel < 49;
+
+          const rCard = document.createElement('div');
+          rCard.className = `level-card review-card ${isReviewLocked ? 'locked' : ''}`;
+          rCard.style.borderColor = 'var(--accent-amber)';
+          rCard.innerHTML = `
+            <div class="level-header">
+              <span class="level-number" style="color:var(--accent-amber);"><i class="fa-solid fa-crown"></i> 總測驗 16</span>
+              <span class="page-tag" style="background:rgba(245,158,11,0.25); color:var(--accent-amber);">P.93~P.100</span>
+            </div>
+            <div class="level-title">👑 期末最終總大會考 (Level 46~49)</div>
+            <div class="level-stats">
+              <span>25 題綜合抽樣</span>
+              <span>${isReviewLocked ? '<i class="fa-solid fa-lock"></i> 需全通關' : '<i class="fa-solid fa-star"></i> 終極挑戰'}</span>
+            </div>
+          `;
+
+          if (!isReviewLocked) {
+            rCard.onclick = () => startReviewTest(reviewId, rStartLvl, rEndLvl, 93, 100);
+          }
+
+          grid.appendChild(rCard);
+        }
       }
     }
 
-    // 開始關卡
+    // 開始常規關卡
     function startLevel(levelNum, startP, endP) {
       const levelData = VOCAB_DATA.find(l => l.level === levelNum) || {
-        level: levelNum,
-        name: `進階餐旅單字關卡 ${levelNum}`,
-        words: VOCAB_DATA[0].words
+        level: levelNum, name: `進階餐旅單字關卡 ${levelNum}`, words: VOCAB_DATA[0].words
       };
       
+      currentGame.isReview = false;
+      currentGame.reviewId = null;
       currentGame.level = levelNum;
       currentGame.currentIndex = 0;
       currentGame.score = 0;
@@ -771,6 +852,46 @@
       document.getElementById('level-screen').style.display = 'none';
       document.getElementById('game-screen').style.display = 'block';
       document.getElementById('game-level-title').innerText = `Level ${levelNum} (P.${startP}~P.${endP}): ${levelData.name}`;
+
+      showCurrentQuestion();
+    }
+
+    // 開始階段總測驗 (15+1)
+    function startReviewTest(reviewId, startLvl, endLvl, startP, endP) {
+      currentGame.isReview = true;
+      currentGame.reviewId = reviewId;
+      currentGame.level = startLvl;
+      currentGame.currentIndex = 0;
+      currentGame.score = 0;
+      currentGame.correctCount = 0;
+
+      // 混合這幾關的所有單字
+      let poolWords = [];
+      for (let l = startLvl; l <= endLvl; l++) {
+        const lData = VOCAB_DATA.find(item => item.level === l);
+        if (lData) poolWords.push(...lData.words);
+        else poolWords.push(...VOCAB_DATA[0].words);
+      }
+
+      shuffleArray(poolWords);
+      const sampled = poolWords.slice(0, 25); // 總測驗抽樣 25 題
+
+      currentGame.questions = sampled.map(target => {
+        const otherWords = poolWords.filter(w => w.en !== target.en);
+        shuffleArray(otherWords);
+        const distractors = otherWords.slice(0, 3).map(w => w.zh);
+        
+        const options = [target.zh, ...distractors];
+        shuffleArray(options);
+
+        return {
+          en: target.en, zh: target.zh, pron: target.pron, options: options
+        };
+      });
+
+      document.getElementById('level-screen').style.display = 'none';
+      document.getElementById('game-screen').style.display = 'block';
+      document.getElementById('game-level-title').innerText = `⚔️ 階段總測驗 ${reviewId} (Level ${startLvl}~${endLvl} | P.${startP}~P.${endP})`;
 
       showCurrentQuestion();
     }
@@ -805,9 +926,11 @@
       const allBtns = document.querySelectorAll('.option-btn');
       allBtns.forEach(b => b.onclick = null);
 
+      const perQuestionScore = currentGame.isReview ? 4 : 5;
+
       if (selectedZh === correctZh) {
         btn.classList.add('correct');
-        currentGame.score += 5;
+        currentGame.score += perQuestionScore;
         currentGame.correctCount += 1;
       } else {
         btn.classList.add('wrong');
@@ -846,10 +969,10 @@
       document.getElementById('result-score-val').innerText = `${finalScore} 分`;
 
       if (passed) {
-        document.getElementById('result-title').innerText = '闖關成功！ 🎉';
-        document.getElementById('result-desc').innerText = `恭喜達成 ${finalScore} 分！成功解鎖關卡地圖下一關！`;
+        document.getElementById('result-title').innerText = currentGame.isReview ? '⚔️ 階段總測驗大成功！ 🎉' : '闖關成功！ 🎉';
+        document.getElementById('result-desc').innerText = `恭喜達成 ${finalScore} 分！成功通過 ${currentGame.isReview ? '階段總測驗 ' + currentGame.reviewId : '關卡 ' + currentGame.level}！`;
         
-        if (currentGame.level >= currentUser.unlockedLevel && currentUser.unlockedLevel < 50) {
+        if (!currentGame.isReview && currentGame.level >= currentUser.unlockedLevel && currentUser.unlockedLevel < 50) {
           currentUser.unlockedLevel = currentGame.level + 1;
           localStorage.setItem('vocab_user_unlocked', currentUser.unlockedLevel);
         }
@@ -858,7 +981,7 @@
         document.getElementById('result-desc').innerText = `本次得分 ${finalScore} 分，未達 85 分及格標準，請再次挑戰！`;
       }
 
-      submitScoreToFirebase(currentGame.level, finalScore);
+      submitScoreToFirebase(currentGame.isReview ? `Review_${currentGame.reviewId}` : currentGame.level, finalScore);
       updateUserUI();
       renderLevelGrid();
     }
@@ -873,11 +996,11 @@
       document.getElementById('level-screen').style.display = 'block';
     }
 
-    function submitScoreToFirebase(levelNum, scoreVal) {
+    function submitScoreToFirebase(lvlKey, scoreVal) {
       const scoreData = {
         grade: currentUser.grade,
         seat_no: currentUser.seat,
-        level: levelNum,
+        level: lvlKey,
         score: scoreVal,
         completed_at: new Date().toISOString()
       };
@@ -886,7 +1009,7 @@
         db.ref('scores').push(scoreData).then(() => {
           db.ref(`students/${currentUser.grade}/${currentUser.seat}/unlocked_level`).set(currentUser.unlockedLevel);
         }).catch(err => {
-          console.log("Firebase 寫入離線測試中。");
+          console.log("Firebase 測試上傳。");
         });
       }
     }

@@ -1,0 +1,27 @@
+⚔️ =============== 教師解答卷：階段總測驗 2 (涵蓋 Level 4~6 | P.9~P.14) =============== ⚔️
+
+01. feedback               -> 顧客回饋
+02. crockery               -> 陶磁餐具
+03. cloakroom              -> 寄物處/衣帽間
+04. side plate             -> 麵包碟/側盤
+05. soup bowl              -> 湯碗
+06. complaint              -> 客訴/抱怨
+07. replace                -> 更換
+08. silverware             -> 銀器餐具
+09. clear                  -> 撤盤/清理
+10. champagne flute        -> 香檳杯
+11. serve                  -> 上菜/服務
+12. recommend              -> 推薦
+13. salt shaker            -> 鹽罐
+14. spill                  -> 打翻/溢出
+15. availability           -> 空位狀況/可用性
+16. waiting list           -> 候補名單
+17. high chair             -> 兒童高腳椅
+18. corkscrew              -> 開酒器/開瓶器
+19. check                  -> 帳單 (美式)
+20. greeting               -> 打招呼/問候
+21. seating plan           -> 座位安排圖
+22. decanter               -> 醒酒瓶
+23. tip                    -> 小費
+24. patio                  -> 戶外露天座位區
+25. confirmation           -> 確認/確認信

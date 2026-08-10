@@ -1,0 +1,27 @@
+⚔️ =============== 教師解答卷：階段總測驗 7 (涵蓋 Level 19~21 | P.39~P.44) =============== ⚔️
+
+01. napkin                 -> 餐巾
+02. glassware              -> 玻璃杯皿
+03. napkin                 -> 餐巾
+04. flatware               -> 西餐餐具 (金屬類)
+05. corkscrew              -> 開酒器/開瓶器
+06. placemat               -> 餐墊
+07. dinner plate           -> 主餐盤
+08. glassware              -> 玻璃杯皿
+09. cutlery                -> 餐具 (刀叉匙類)
+10. crockery               -> 陶磁餐具
+11. water goblet           -> 水杯/高腳水杯
+12. champagne flute        -> 香檳杯
+13. dinner plate           -> 主餐盤
+14. placemat               -> 餐墊
+15. tablecloth             -> 桌布
+16. soup bowl              -> 湯碗
+17. side plate             -> 麵包碟/側盤
+18. toothpick              -> 牙籤
+19. silverware             -> 銀器餐具
+20. crockery               -> 陶磁餐具
+21. champagne flute        -> 香檳杯
+22. tablecloth             -> 桌布
+23. wine glass             -> 葡萄酒杯
+24. cutlery                -> 餐具 (刀叉匙類)
+25. soup bowl              -> 湯碗

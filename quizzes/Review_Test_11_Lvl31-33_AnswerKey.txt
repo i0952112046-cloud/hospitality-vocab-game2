@@ -1,0 +1,27 @@
+⚔️ =============== 教師解答卷：階段總測驗 11 (涵蓋 Level 31~33 | P.63~P.68) =============== ⚔️
+
+01. soup bowl              -> 湯碗
+02. napkin                 -> 餐巾
+03. glassware              -> 玻璃杯皿
+04. wine glass             -> 葡萄酒杯
+05. napkin                 -> 餐巾
+06. side plate             -> 麵包碟/側盤
+07. cutlery                -> 餐具 (刀叉匙類)
+08. wine glass             -> 葡萄酒杯
+09. salt shaker            -> 鹽罐
+10. water goblet           -> 水杯/高腳水杯
+11. flatware               -> 西餐餐具 (金屬類)
+12. crockery               -> 陶磁餐具
+13. saucer                 -> 茶碟/杯墊
+14. toothpick              -> 牙籤
+15. dinner plate           -> 主餐盤
+16. side plate             -> 麵包碟/側盤
+17. pepper shaker          -> 胡椒罐
+18. saucer                 -> 茶碟/杯墊
+19. salt shaker            -> 鹽罐
+20. water goblet           -> 水杯/高腳水杯
+21. placemat               -> 餐墊
+22. wine glass             -> 葡萄酒杯
+23. pepper shaker          -> 胡椒罐
+24. cutlery                -> 餐具 (刀叉匙類)
+25. dinner plate           -> 主餐盤

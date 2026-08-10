@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>專二餐服 教師即時後台管理系統</title>
+  <title>專二餐服 教師即時後台管理系統 (含15+1階段總測驗)</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -257,10 +257,10 @@
     <div class="header-bar">
       <div>
         <h1>專二餐服 教師即時後台管理系統 <span style="font-size:0.9rem; font-weight:normal; color:var(--accent-emerald);"><i class="fa-solid fa-shield-halved"></i> 已授權驗證</span></h1>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">從課本第3頁起，每兩頁一關 (Level 1 = P.3~P.4, Level 2 = P.5~P.6...)</p>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">49個雙頁常規關卡 + 15+1階段總測驗進度即時監控</p>
       </div>
       <div style="display: flex; gap: 12px;">
-        <button class="btn btn-emerald" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> 匯出全班 Excel 報表</button>
+        <button class="btn btn-emerald" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> 匯出全班 Excel 報表 (含15+1總測驗)</button>
         <button class="btn" style="background: rgba(255,255,255,0.1);" onclick="generateMockData()"><i class="fa-solid fa-wand-magic-sparkles"></i> 載入模擬測試數據</button>
         <button class="btn" style="background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4);" onclick="logoutTeacher()"><i class="fa-solid fa-lock"></i> 鎖定登出</button>
       </div>
@@ -272,11 +272,11 @@
         <div class="stat-val" id="stat-total-students">80 人</div>
       </div>
       <div class="stat-card">
-        <span style="font-size: 0.85rem; color: var(--text-muted);">平均解鎖進度</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">常規關卡平均進度</span>
         <div class="stat-val" id="stat-avg-progress" style="color: var(--accent-emerald);">0%</div>
       </div>
       <div class="stat-card">
-        <span style="font-size: 0.85rem; color: var(--text-muted);">已完成 49 關人數</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">已完成 49 關全通關</span>
         <div class="stat-val" id="stat-completed-count" style="color: var(--accent-amber);">0 人</div>
       </div>
     </div>
@@ -284,7 +284,7 @@
     <div class="glass-card">
       <div class="tab-group">
         <button class="tab-btn active" id="tab-overview" onclick="switchView('overview')"><i class="fa-solid fa-chart-pie"></i> 學生進度總覽模式</button>
-        <button class="tab-btn" id="tab-level" onclick="switchView('level')"><i class="fa-solid fa-layer-group"></i> 單關詳細檢視模式</button>
+        <button class="tab-btn" id="tab-level" onclick="switchView('level')"><i class="fa-solid fa-layer-group"></i> 單關 / 總測驗詳細檢視</button>
       </div>
 
       <div class="filter-bar">
@@ -296,7 +296,7 @@
         </select>
 
         <div id="level-select-container" style="display: none; align-items: center; gap: 10px;">
-          <label style="font-size: 0.9rem; color: var(--text-muted);">選擇檢視關卡：</label>
+          <label style="font-size: 0.9rem; color: var(--text-muted);">選擇檢視關卡/總測驗：</label>
           <select class="form-control" id="select-level-inspect" style="width: auto;" onchange="renderCurrentView()">
             <!-- Added dynamically -->
           </select>
@@ -317,7 +317,6 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <script>
-    // 教師預設管理密碼 (預設: teacher888)
     const TEACHER_PASSWORD = "teacher888";
 
     // Firebase Config
@@ -388,17 +387,46 @@
       generateMockData();
     }
 
+    // 動態加入 49 關常規關卡 + 16 個階段總測驗選項
     function initLevelSelectOptions() {
       const sel = document.getElementById('select-level-inspect');
       sel.innerHTML = '';
+
+      // 1. 常規關卡 1~49
+      const optGroupLevels = document.createElement('optgroup');
+      optGroupLevels.label = '常規關卡 (Level 1~49)';
       for (let i = 1; i <= 49; i++) {
         const startP = 3 + (i - 1) * 2;
         const endP = startP + 1;
         const opt = document.createElement('option');
         opt.value = i;
         opt.innerText = `Level ${i} (課本 P.${startP}~P.${endP})`;
-        sel.appendChild(opt);
+        optGroupLevels.appendChild(opt);
       }
+      sel.appendChild(optGroupLevels);
+
+      // 2. 階段總測驗 1~16
+      const optGroupReviews = document.createElement('optgroup');
+      optGroupReviews.label = '⚔️ 階段總測驗 (15+1個)';
+
+      for (let r = 1; r <= 15; r++) {
+        const lvlStart = (r - 1) * 3 + 1;
+        const lvlEnd = r * 3;
+        const pStart = 3 + (lvlStart - 1) * 2;
+        const pEnd = 4 + (lvlEnd - 1) * 2;
+        const opt = document.createElement('option');
+        opt.value = `Review_${r}`;
+        opt.innerText = `⚔️ 總測驗 ${r} (涵蓋 Level ${lvlStart}~${lvlEnd} | P.${pStart}~P.${pEnd})`;
+        optGroupReviews.appendChild(opt);
+      }
+
+      // 第 16 個總測驗
+      const opt16 = document.createElement('option');
+      opt16.value = `Review_16`;
+      opt16.innerText = `👑 期末總大會考 16 (涵蓋 Level 46~49 | P.93~P.100)`;
+      optGroupReviews.appendChild(opt16);
+
+      sel.appendChild(optGroupReviews);
     }
 
     function listenFirebase() {
@@ -438,9 +466,9 @@
         <tr>
           <th>年級</th>
           <th>座號</th>
-          <th>最高解鎖關卡 (頁碼)</th>
-          <th>總完成進度 (% / 49關)</th>
-          <th>累積挑戰次數</th>
+          <th>最高解鎖常規關卡</th>
+          <th>常規完成度 (% / 49關)</th>
+          <th>已通過總測驗數 (% / 16次)</th>
           <th>狀態</th>
         </tr>
       `;
@@ -457,13 +485,23 @@
         for (let s = 1; s <= 40; s++) {
           totalStudents++;
           const studentScores = scoresData.filter(item => item.grade === g && item.seat_no === s);
-          const passedLevels = new Set(studentScores.filter(i => i.score >= 85).map(i => i.level));
-          const maxUnlocked = Math.min(49, passedLevels.size + 1);
+          
+          // 常規關卡通關數
+          const passedRegularLevels = new Set(
+            studentScores.filter(i => typeof i.level === 'number' && i.score >= 85).map(i => i.level)
+          );
+          const maxUnlocked = Math.min(49, passedRegularLevels.size + 1);
+
+          // 總測驗通關數 (Review_1 ~ Review_16)
+          const passedReviews = new Set(
+            studentScores.filter(i => typeof i.level === 'string' && i.level.startsWith('Review_') && i.score >= 85).map(i => i.level)
+          );
 
           sumUnlocked += maxUnlocked;
           if (maxUnlocked >= 49) completedCount++;
 
-          const pct = Math.round((passedLevels.size / 49) * 100);
+          const pctRegular = Math.round((passedRegularLevels.size / 49) * 100);
+          const reviewPct = Math.round((passedReviews.size / 16) * 100);
           const startP = 3 + (maxUnlocked - 1) * 2;
           const endP = startP + 1;
 
@@ -474,16 +512,18 @@
             <td><span style="font-weight:700;">Level ${maxUnlocked}</span> (P.${startP}~P.${endP})</td>
             <td>
               <div style="display:flex; align-items:center; gap:12px;">
-                <div class="progress-bar" style="width:140px;">
-                  <div class="progress-fill" style="width:${pct}%;"></div>
+                <div class="progress-bar" style="width:120px;">
+                  <div class="progress-fill" style="width:${pctRegular}%;"></div>
                 </div>
-                <span>${pct}%</span>
+                <span>${pctRegular}%</span>
               </div>
             </td>
-            <td>${studentScores.length} 次</td>
             <td>
-              <span class="badge ${passedLevels.size >= 49 ? 'badge-pass' : 'badge-fail'}">
-                ${passedLevels.size >= 49 ? '已全通關 🏆' : '闖關中'}
+              <span style="color:var(--accent-amber); font-weight:700;">${passedReviews.size} / 16 關</span> (${reviewPct}%)
+            </td>
+            <td>
+              <span class="badge ${passedRegularLevels.size >= 49 ? 'badge-pass' : 'badge-fail'}">
+                ${passedRegularLevels.size >= 49 ? '常規全通關 🏆' : '闖關中'}
               </span>
             </td>
           `;
@@ -500,16 +540,16 @@
       const thead = document.getElementById('table-head');
       const tbody = document.getElementById('table-body');
       const gradeFilter = document.getElementById('filter-grade').value;
-      const targetLevel = parseInt(document.getElementById('select-level-inspect').value);
+      const targetVal = document.getElementById('select-level-inspect').value;
 
-      const startP = 3 + (targetLevel - 1) * 2;
-      const endP = startP + 1;
+      const isReviewSelect = typeof targetVal === 'string' && targetVal.startsWith('Review_');
+      const targetLevel = isReviewSelect ? targetVal : parseInt(targetVal);
 
       thead.innerHTML = `
         <tr>
           <th>年級</th>
           <th>座號</th>
-          <th>關卡 (頁碼)</th>
+          <th>檢視項目</th>
           <th>最高得分</th>
           <th>挑戰次數</th>
           <th>最近挑戰時間</th>
@@ -523,7 +563,7 @@
         if (gradeFilter !== 'all' && parseInt(gradeFilter) !== g) continue;
 
         for (let s = 1; s <= 40; s++) {
-          const records = scoresData.filter(i => i.grade === g && i.seat_no === s && i.level === targetLevel);
+          const records = scoresData.filter(i => i.grade === g && i.seat_no === s && i.level == targetLevel);
           const maxScore = records.length > 0 ? Math.max(...records.map(r => r.score)) : null;
           const lastRecord = records.length > 0 ? records[records.length - 1].completed_at : null;
           const isPassed = maxScore !== null && maxScore >= 85;
@@ -532,7 +572,7 @@
           tr.innerHTML = `
             <td>${g} 年級</td>
             <td>${s} 號</td>
-            <td>Level ${targetLevel} (P.${startP}~P.${endP})</td>
+            <td>${isReviewSelect ? `⚔️ 總測驗 ${targetLevel.replace('Review_','')}` : `Level ${targetLevel}`}</td>
             <td><b style="color:${maxScore >= 85 ? 'var(--accent-emerald)' : 'var(--accent-amber)'};">${maxScore !== null ? maxScore + '分' : '未挑戰'}</b></td>
             <td>${records.length} 次</td>
             <td style="font-size:0.8rem; color:var(--text-muted);">${lastRecord ? new Date(lastRecord).toLocaleString('zh-TW') : '-'}</td>
@@ -547,27 +587,52 @@
       }
     }
 
+    // 匯出包含 49 關常規分數 + 16 個總測驗最高分之完整 Excel 報表
     function exportToExcel() {
       const matrix = [];
-      const header = ["年級", "座號", "完成關卡數", "進度(%)"];
+      const header = ["年級", "座號", "常規完成關卡數", "常規進度(%)", "已通過總測驗數"];
+      
+      // 加入常規關卡欄位
       for (let i = 1; i <= 49; i++) {
         const startP = 3 + (i - 1) * 2;
         const endP = startP + 1;
-        header.push(`Level_${i}_(P.${startP}-P.${endP})_最高分`);
+        header.push(`Level_${i}_(P.${startP}-P.${endP})`);
       }
+
+      // 加入 16 個階段總測驗欄位
+      for (let r = 1; r <= 16; r++) {
+        header.push(`階段總測驗_${r}_最高分`);
+      }
+
       matrix.push(header);
 
       for (let g of [2, 3]) {
         for (let s = 1; s <= 40; s++) {
           const studentScores = scoresData.filter(item => item.grade === g && item.seat_no === s);
-          const passedCount = new Set(studentScores.filter(i => i.score >= 85).map(i => i.level)).size;
-          const pct = Math.round((passedCount / 49) * 100);
+          
+          const passedRegularCount = new Set(
+            studentScores.filter(i => typeof i.level === 'number' && i.score >= 85).map(i => i.level)
+          ).size;
 
-          const row = [g, s, passedCount, `${pct}%`];
+          const passedReviewCount = new Set(
+            studentScores.filter(i => typeof i.level === 'string' && i.level.startsWith('Review_') && i.score >= 85).map(i => i.level)
+          ).size;
 
+          const pct = Math.round((passedRegularCount / 49) * 100);
+
+          const row = [g, s, passedRegularCount, `${pct}%`, `${passedReviewCount} / 16`];
+
+          // 填入 49 關最高分
           for (let i = 1; i <= 49; i++) {
             const levelScores = studentScores.filter(item => item.level === i).map(item => item.score);
             row.push(levelScores.length > 0 ? Math.max(...levelScores) : 0);
+          }
+
+          // 填入 16 個總測驗最高分
+          for (let r = 1; r <= 16; r++) {
+            const revKey = `Review_${r}`;
+            const revScores = studentScores.filter(item => item.level === revKey).map(item => item.score);
+            row.push(revScores.length > 0 ? Math.max(...revScores) : 0);
           }
 
           matrix.push(row);
@@ -578,7 +643,7 @@
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "專二餐服單字成績總表");
 
-      XLSX.writeFile(wb, "專二餐服_雲端單字闖關全班成績總表.xlsx");
+      XLSX.writeFile(wb, "專二餐服_雲端單字闖關與15+1總測驗全班成績總表.xlsx");
     }
 
     function generateMockData() {
@@ -591,12 +656,18 @@
           for (let l = 1; l <= maxLvl; l++) {
             const score = Math.floor(Math.random() * 25) + 78;
             scoresData.push({
-              grade: g,
-              seat_no: s,
-              level: l,
-              score: score,
+              grade: g, seat_no: s, level: l, score: score,
               completed_at: new Date(now.getTime() - Math.random() * 86400000 * 5).toISOString()
             });
+
+            // 模擬總測驗數據
+            if (l % 3 === 0) {
+              const rId = l / 3;
+              scoresData.push({
+                grade: g, seat_no: s, level: `Review_${rId}`, score: Math.floor(Math.random() * 20) + 80,
+                completed_at: new Date(now.getTime() - Math.random() * 86400000 * 3).toISOString()
+              });
+            }
           }
         }
       }

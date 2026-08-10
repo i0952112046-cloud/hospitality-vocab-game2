@@ -1,0 +1,27 @@
+⚔️ =============== 教師解答卷：階段總測驗 15 (涵蓋 Level 43~45 | P.87~P.92) =============== ⚔️
+
+01. placemat               -> 餐墊
+02. toothpick              -> 牙籤
+03. decanter               -> 醒酒瓶
+04. tablecloth             -> 桌布
+05. flatware               -> 西餐餐具 (金屬類)
+06. champagne flute        -> 香檳杯
+07. soup bowl              -> 湯碗
+08. saucer                 -> 茶碟/杯墊
+09. toothpick              -> 牙籤
+10. decanter               -> 醒酒瓶
+11. silverware             -> 銀器餐具
+12. crockery               -> 陶磁餐具
+13. flatware               -> 西餐餐具 (金屬類)
+14. side plate             -> 麵包碟/側盤
+15. salt shaker            -> 鹽罐
+16. decanter               -> 醒酒瓶
+17. champagne flute        -> 香檳杯
+18. corkscrew              -> 開酒器/開瓶器
+19. tablecloth             -> 桌布
+20. napkin                 -> 餐巾
+21. toothpick              -> 牙籤
+22. cutlery                -> 餐具 (刀叉匙類)
+23. pepper shaker          -> 胡椒罐
+24. salt shaker            -> 鹽罐
+25. glassware              -> 玻璃杯皿

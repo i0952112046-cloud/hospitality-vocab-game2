@@ -1,0 +1,27 @@
+⚔️ =============== 教師解答卷：階段總測驗 6 (涵蓋 Level 16~18 | P.33~P.38) =============== ⚔️
+
+01. saucer                 -> 茶碟/杯墊
+02. flatware               -> 西餐餐具 (金屬類)
+03. champagne flute        -> 香檳杯
+04. glassware              -> 玻璃杯皿
+05. corkscrew              -> 開酒器/開瓶器
+06. flatware               -> 西餐餐具 (金屬類)
+07. salt shaker            -> 鹽罐
+08. corkscrew              -> 開酒器/開瓶器
+09. placemat               -> 餐墊
+10. placemat               -> 餐墊
+11. glassware              -> 玻璃杯皿
+12. wine glass             -> 葡萄酒杯
+13. toothpick              -> 牙籤
+14. saucer                 -> 茶碟/杯墊
+15. pepper shaker          -> 胡椒罐
+16. dinner plate           -> 主餐盤
+17. dinner plate           -> 主餐盤
+18. champagne flute        -> 香檳杯
+19. napkin                 -> 餐巾
+20. champagne flute        -> 香檳杯
+21. wine glass             -> 葡萄酒杯
+22. side plate             -> 麵包碟/側盤
+23. silverware             -> 銀器餐具
+24. side plate             -> 麵包碟/側盤
+25. decanter               -> 醒酒瓶

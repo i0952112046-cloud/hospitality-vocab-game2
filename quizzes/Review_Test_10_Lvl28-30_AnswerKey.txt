@@ -1,0 +1,27 @@
+⚔️ =============== 教師解答卷：階段總測驗 10 (涵蓋 Level 28~30 | P.57~P.62) =============== ⚔️
+
+01. silverware             -> 銀器餐具
+02. cutlery                -> 餐具 (刀叉匙類)
+03. toothpick              -> 牙籤
+04. corkscrew              -> 開酒器/開瓶器
+05. side plate             -> 麵包碟/側盤
+06. dinner plate           -> 主餐盤
+07. champagne flute        -> 香檳杯
+08. tablecloth             -> 桌布
+09. water goblet           -> 水杯/高腳水杯
+10. wine glass             -> 葡萄酒杯
+11. flatware               -> 西餐餐具 (金屬類)
+12. decanter               -> 醒酒瓶
+13. tablecloth             -> 桌布
+14. silverware             -> 銀器餐具
+15. champagne flute        -> 香檳杯
+16. salt shaker            -> 鹽罐
+17. wine glass             -> 葡萄酒杯
+18. dinner plate           -> 主餐盤
+19. napkin                 -> 餐巾
+20. side plate             -> 麵包碟/側盤
+21. tablecloth             -> 桌布
+22. soup bowl              -> 湯碗
+23. water goblet           -> 水杯/高腳水杯
+24. silverware             -> 銀器餐具
+25. crockery               -> 陶磁餐具

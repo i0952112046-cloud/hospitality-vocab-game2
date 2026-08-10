@@ -1,8 +1,10 @@
 {
   "curriculum": "專二餐服/餐旅英文",
-  "rule_description": "從課本第三頁開始，每兩頁劃分為一個關卡 (Level 1 = P.3~P.4, Level 2 = P.5~P.6 ...)",
+  "rule_description": "從課本第三頁開始，每兩頁劃分為一個常規關卡。每 3 關設有 1 個階段總測驗 (共 15 個)，最後 4 關 (Level 46~49) 設有 1 個期末總測驗，共計 15+1 (16個) 總測驗。",
   "total_levels": 49,
   "words_per_level": 20,
+  "total_review_tests": 16,
+  "review_tests_rule": "Test 1~15 (3 regular levels each), Test 16 (last 4 regular levels: 46~49)",
   "levels": [
     {
       "level": 1,

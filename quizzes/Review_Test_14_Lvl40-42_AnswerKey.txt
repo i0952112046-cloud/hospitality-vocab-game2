@@ -1,0 +1,27 @@
+⚔️ =============== 教師解答卷：階段總測驗 14 (涵蓋 Level 40~42 | P.81~P.86) =============== ⚔️
+
+01. wine glass             -> 葡萄酒杯
+02. dinner plate           -> 主餐盤
+03. crockery               -> 陶磁餐具
+04. cutlery                -> 餐具 (刀叉匙類)
+05. cutlery                -> 餐具 (刀叉匙類)
+06. toothpick              -> 牙籤
+07. cutlery                -> 餐具 (刀叉匙類)
+08. corkscrew              -> 開酒器/開瓶器
+09. wine glass             -> 葡萄酒杯
+10. wine glass             -> 葡萄酒杯
+11. placemat               -> 餐墊
+12. placemat               -> 餐墊
+13. flatware               -> 西餐餐具 (金屬類)
+14. decanter               -> 醒酒瓶
+15. flatware               -> 西餐餐具 (金屬類)
+16. salt shaker            -> 鹽罐
+17. salt shaker            -> 鹽罐
+18. tablecloth             -> 桌布
+19. pepper shaker          -> 胡椒罐
+20. flatware               -> 西餐餐具 (金屬類)
+21. crockery               -> 陶磁餐具
+22. corkscrew              -> 開酒器/開瓶器
+23. silverware             -> 銀器餐具
+24. toothpick              -> 牙籤
+25. champagne flute        -> 香檳杯

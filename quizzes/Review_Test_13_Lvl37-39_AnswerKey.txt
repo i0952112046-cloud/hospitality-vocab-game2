@@ -1,0 +1,27 @@
+⚔️ =============== 教師解答卷：階段總測驗 13 (涵蓋 Level 37~39 | P.75~P.80) =============== ⚔️
+
+01. cutlery                -> 餐具 (刀叉匙類)
+02. water goblet           -> 水杯/高腳水杯
+03. corkscrew              -> 開酒器/開瓶器
+04. toothpick              -> 牙籤
+05. silverware             -> 銀器餐具
+06. placemat               -> 餐墊
+07. champagne flute        -> 香檳杯
+08. champagne flute        -> 香檳杯
+09. tablecloth             -> 桌布
+10. glassware              -> 玻璃杯皿
+11. tablecloth             -> 桌布
+12. decanter               -> 醒酒瓶
+13. soup bowl              -> 湯碗
+14. salt shaker            -> 鹽罐
+15. saucer                 -> 茶碟/杯墊
+16. silverware             -> 銀器餐具
+17. flatware               -> 西餐餐具 (金屬類)
+18. corkscrew              -> 開酒器/開瓶器
+19. napkin                 -> 餐巾
+20. saucer                 -> 茶碟/杯墊
+21. dinner plate           -> 主餐盤
+22. soup bowl              -> 湯碗
+23. silverware             -> 銀器餐具
+24. soup bowl              -> 湯碗
+25. pepper shaker          -> 胡椒罐

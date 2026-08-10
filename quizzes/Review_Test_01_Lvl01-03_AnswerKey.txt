@@ -1,0 +1,27 @@
+⚔️ =============== 教師解答卷：階段總測驗 1 (涵蓋 Level 1~3 | P.3~P.8) =============== ⚔️
+
+01. combo                  -> 組合餐
+02. bartender              -> 調酒師
+03. corkscrew              -> 開酒器/開瓶器
+04. specialty              -> 招牌菜/特色菜
+05. maître d'              -> 餐廳經理/總管
+06. condiment              -> 調味料
+07. tablecloth             -> 桌布
+08. champagne flute        -> 香檳杯
+09. flatware               -> 西餐餐具 (金屬類)
+10. napkin                 -> 餐巾
+11. aperitif               -> 餐前酒
+12. garnish                -> 盤飾/裝飾物
+13. pastry chef            -> 點心師傅/甜點廚師
+14. captain                -> 領班/桌長
+15. hostess                -> 女接待員/領檯
+16. caterer                -> 外辦外燴業者
+17. water goblet           -> 水杯/高腳水杯
+18. glassware              -> 玻璃杯皿
+19. cashier                -> 出納員/收銀員
+20. table d'hote           -> 套餐菜單
+21. silverware             -> 銀器餐具
+22. dinner plate           -> 主餐盤
+23. entrée                 -> 主菜/前菜
+24. dessert                -> 甜點
+25. dressing               -> 沙拉醬

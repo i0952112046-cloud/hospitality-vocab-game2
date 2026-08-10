@@ -1,0 +1,27 @@
+⚔️ =============== 教師解答卷：階段總測驗 9 (涵蓋 Level 25~27 | P.51~P.56) =============== ⚔️
+
+01. cutlery                -> 餐具 (刀叉匙類)
+02. wine glass             -> 葡萄酒杯
+03. soup bowl              -> 湯碗
+04. saucer                 -> 茶碟/杯墊
+05. salt shaker            -> 鹽罐
+06. placemat               -> 餐墊
+07. saucer                 -> 茶碟/杯墊
+08. flatware               -> 西餐餐具 (金屬類)
+09. glassware              -> 玻璃杯皿
+10. glassware              -> 玻璃杯皿
+11. silverware             -> 銀器餐具
+12. flatware               -> 西餐餐具 (金屬類)
+13. silverware             -> 銀器餐具
+14. toothpick              -> 牙籤
+15. decanter               -> 醒酒瓶
+16. flatware               -> 西餐餐具 (金屬類)
+17. pepper shaker          -> 胡椒罐
+18. side plate             -> 麵包碟/側盤
+19. glassware              -> 玻璃杯皿
+20. napkin                 -> 餐巾
+21. dinner plate           -> 主餐盤
+22. corkscrew              -> 開酒器/開瓶器
+23. champagne flute        -> 香檳杯
+24. pepper shaker          -> 胡椒罐
+25. cutlery                -> 餐具 (刀叉匙類)
