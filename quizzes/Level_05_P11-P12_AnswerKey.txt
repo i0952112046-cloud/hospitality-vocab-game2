@@ -1,0 +1,23 @@
+=============== 教師解答卷 (關卡 5 | 課本頁碼: P.11 - P.12) ===============
+單字主題：P.11 - P.12 服務流程與應對技巧
+
+01. refill                 -> 續杯/加水
+02. apologize              -> 致歉
+03. bill                   -> 帳單 (英式)
+04. tip                    -> 小費
+05. gratuity               -> 小費/服務費
+06. escort                 -> 引導/帶位
+07. clear                  -> 撤盤/清理
+08. stain                  -> 污漬
+09. feedback               -> 顧客回饋
+10. recommend              -> 推薦
+11. order                  -> 點餐/訂單
+12. serve                  -> 上菜/服務
+13. check                  -> 帳單 (美式)
+14. spill                  -> 打翻/溢出
+15. compliment             -> 致意/稱讚
+16. complaint              -> 客訴/抱怨
+17. greeting               -> 打招呼/問候
+18. suggest                -> 建議
+19. replace                -> 更換
+20. receipt                -> 收據/發票

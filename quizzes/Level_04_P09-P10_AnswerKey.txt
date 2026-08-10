@@ -1,0 +1,23 @@
+=============== 教師解答卷 (關卡 4 | 課本頁碼: P.9 - P.10) ===============
+單字主題：P.9 - P.10 訂位與接待用語
+
+01. smoking area           -> 吸菸區
+02. minimum charge         -> 最低消費
+03. party                  -> 同行搭檔/同行顧客群
+04. confirmation           -> 確認/確認信
+05. waiting list           -> 候補名單
+06. cancelation            -> 取消
+07. seating plan           -> 座位安排圖
+08. booth                  -> 包廂座/卡座
+09. vip room               -> 貴賓室
+10. booking                -> 預訂
+11. non-smoking            -> 禁菸區
+12. cloakroom              -> 寄物處/衣帽間
+13. walk-in                -> 未預約直接到店顧客
+14. high chair             -> 兒童高腳椅
+15. dress code             -> 服裝規定
+16. patio                  -> 戶外露天座位區
+17. wheelchair             -> 輪椅 access
+18. availability           -> 空位狀況/可用性
+19. deposit                -> 訂金
+20. reservation            -> 預約/訂位

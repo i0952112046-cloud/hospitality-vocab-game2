@@ -1,0 +1,20 @@
+{
+  "rules": {
+    ".read": true,
+    "scores": {
+      "$score_id": {
+        ".write": "!data.exists() && newData.exists()",
+        ".validate": "newData.hasChildren(['grade', 'seat_no', 'level', 'score', 'completed_at']) && newData.child('grade').isNumber() && newData.child('grade').val() >= 2 && newData.child('grade').val() <= 3 && newData.child('seat_no').isNumber() && newData.child('seat_no').val() >= 1 && newData.child('seat_no').val() <= 40 && newData.child('level').isNumber() && newData.child('level').val() >= 1 && newData.child('level').val() <= 49 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100"
+      }
+    },
+    "students": {
+      "$grade": {
+        "$seat": {
+          "unlocked_level": {
+            ".write": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 50"
+          }
+        }
+      }
+    }
+  }
+}

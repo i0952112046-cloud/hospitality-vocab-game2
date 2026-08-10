@@ -1,0 +1,23 @@
+=============== 教師解答卷 (關卡 3 | 課本頁碼: P.7 - P.8) ===============
+單字主題：P.7 - P.8 菜單與菜餚順序
+
+01. combo                  -> 組合餐
+02. aperitif               -> 餐前酒
+03. garnish                -> 盤飾/裝飾物
+04. digestif               -> 餐後酒
+05. a la carte             -> 單點菜單
+06. appetizer              -> 開胃菜/前菜
+07. soup                   -> 湯品
+08. dressing               -> 沙拉醬
+09. condiment              -> 調味料
+10. specialty              -> 招牌菜/特色菜
+11. plat du jour           -> 今日特餐
+12. starter                -> 開胃餐點
+13. side dish              -> 副菜/配菜
+14. salad                  -> 沙拉
+15. beverage               -> 飲料
+16. buffet                 -> 自助餐
+17. main course            -> 主菜
+18. entrée                 -> 主菜/前菜
+19. dessert                -> 甜點
+20. table d'hote           -> 套餐菜單

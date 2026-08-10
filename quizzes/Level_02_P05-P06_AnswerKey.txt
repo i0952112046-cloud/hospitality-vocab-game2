@@ -1,0 +1,23 @@
+=============== 教師解答卷 (關卡 2 | 課本頁碼: P.5 - P.6) ===============
+單字主題：P.5 - P.6 餐廳職位與團隊
+
+01. manager                -> 經理
+02. sous chef              -> 副主廚
+03. sommelier              -> 侍酒師
+04. hostess                -> 女接待員/領檯
+05. supervisor             -> 主管
+06. captain                -> 領班/桌長
+07. dishwasher             -> 洗碗工
+08. receptionist           -> 接待員
+09. bartender              -> 調酒師
+10. maître d'              -> 餐廳經理/總管
+11. caterer                -> 外辦外燴業者
+12. concierge              -> 禮賓人員
+13. busboy                 -> 撤碗盤助理/初級服務員
+14. head chef              -> 主廚
+15. trainee                -> 實習生
+16. cashier                -> 出納員/收銀員
+17. barista                -> 咖啡師
+18. waitress               -> 女服務員
+19. pastry chef            -> 點心師傅/甜點廚師
+20. waiter                 -> 男服務員

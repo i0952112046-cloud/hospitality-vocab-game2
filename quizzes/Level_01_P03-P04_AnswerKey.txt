@@ -1,0 +1,23 @@
+=============== 教師解答卷 (關卡 1 | 課本頁碼: P.3 - P.4) ===============
+單字主題：P.3 - P.4 餐具與檯面基本用語
+
+01. salt shaker            -> 鹽罐
+02. corkscrew              -> 開酒器/開瓶器
+03. water goblet           -> 水杯/高腳水杯
+04. pepper shaker          -> 胡椒罐
+05. silverware             -> 銀器餐具
+06. flatware               -> 西餐餐具 (金屬類)
+07. napkin                 -> 餐巾
+08. placemat               -> 餐墊
+09. glassware              -> 玻璃杯皿
+10. wine glass             -> 葡萄酒杯
+11. side plate             -> 麵包碟/側盤
+12. crockery               -> 陶磁餐具
+13. saucer                 -> 茶碟/杯墊
+14. dinner plate           -> 主餐盤
+15. cutlery                -> 餐具 (刀叉匙類)
+16. toothpick              -> 牙籤
+17. soup bowl              -> 湯碗
+18. champagne flute        -> 香檳杯
+19. tablecloth             -> 桌布
+20. decanter               -> 醒酒瓶
