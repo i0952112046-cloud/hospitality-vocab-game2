@@ -809,6 +809,35 @@
       document.getElementById('display-unlocked').innerText = `最高解鎖關卡: Level ${currentUser.unlockedLevel}`;
     }
 
+    function getLevelStats(levelKey) {
+      loadLocalScores();
+      const records = localScoresHistory.filter(i => i.grade === currentUser.grade && String(i.level) === String(levelKey));
+      
+      const myRecords = records.filter(i => i.seat_no === currentUser.seat);
+      if (myRecords.length === 0) {
+        return { hasPlayed: false, bestScore: null, rank: null };
+      }
+
+      const myBestScore = Math.max(...myRecords.map(i => i.score));
+
+      // 計算同級單元排名
+      const seatBest = {};
+      records.forEach(item => {
+        if (!seatBest[item.seat_no] || item.score > seatBest[item.seat_no]) {
+          seatBest[item.seat_no] = item.score;
+        }
+      });
+
+      const sortedSeats = Object.keys(seatBest).map(seat => ({
+        seat: parseInt(seat), score: seatBest[seat]
+      })).sort((a, b) => b.score - a.score);
+
+      const myIndex = sortedSeats.findIndex(s => s.seat === currentUser.seat);
+      const myRank = myIndex >= 0 ? myIndex + 1 : 1;
+
+      return { hasPlayed: true, bestScore: myBestScore, rank: myRank };
+    }
+
     function renderLevelGrid() {
       const grid = document.getElementById('level-grid-container');
       grid.innerHTML = '';
@@ -825,9 +854,24 @@
         };
 
         const isLocked = i > currentUser.unlockedLevel;
+        const stats = getLevelStats(i);
 
         const card = document.createElement('div');
         card.className = `level-card ${isLocked ? 'locked' : ''}`;
+        
+        let statsHTML = '';
+        if (stats.hasPlayed) {
+          const passClass = stats.bestScore >= 85 ? 'badge-pass' : 'badge-fail';
+          statsHTML = `
+            <span style="display:inline-flex; gap:6px; align-items:center;">
+              <span class="badge ${passClass}">最高 ${stats.bestScore}分</span>
+              <span class="badge badge-rank">🏆 第${stats.rank}名</span>
+            </span>
+          `;
+        } else {
+          statsHTML = `<span>${isLocked ? '<i class="fa-solid fa-lock"></i> 未解鎖' : '<i class="fa-solid fa-unlock"></i> 可挑戰 (>=85分)'}</span>`;
+        }
+
         card.innerHTML = `
           <div class="level-header">
             <span class="level-number">LEVEL ${i}</span>
@@ -836,7 +880,7 @@
           <div class="level-title">${levelData.name}</div>
           <div class="level-stats">
             <span>20 題</span>
-            <span>${isLocked ? '<i class="fa-solid fa-lock"></i> 未解鎖' : '<i class="fa-solid fa-unlock"></i> 可挑戰 (>=85分)'}</span>
+            ${statsHTML}
           </div>
         `;
 
@@ -853,12 +897,86 @@
           const rStartP = 3 + (rStartLvl - 1) * 2;
           const rEndP = 4 + (rEndLvl - 1) * 2;
           const isReviewLocked = i > currentUser.unlockedLevel;
+          const rStats = getLevelStats(`Review_${reviewId}`);
+
+          let rStatsHTML = '';
+          if (rStats.hasPlayed) {
+            const rPassClass = rStats.bestScore >= 85 ? 'badge-pass' : 'badge-fail';
+            rStatsHTML = `
+              <span style="display:inline-flex; gap:6px; align-items:center;">
+                <span class="badge ${rPassClass}">最高 ${rStats.bestScore}分</span>
+                <span class="badge badge-rank">🏆 第${rStats.rank}名</span>
+              </span>
+            `;
+          } else {
+            rStatsHTML = `<span>${isReviewLocked ? '<i class="fa-solid fa-lock"></i> 需通關Level ' + i : '<i class="fa-solid fa-shield-halved"></i> 開啟挑戰'}</span>`;
+          }
 
           const rCard = document.createElement('div');
           rCard.className = `level-card review-card ${isReviewLocked ? 'locked' : ''}`;
           rCard.innerHTML = `
             <div class="level-header">
               <span class="level-number"><i class="fa-solid fa-trophy"></i> 總測驗 ${reviewId}</span>
+              <span class="page-tag">P.${rStartP}~P.${rEndP}</span>
+            </div>
+            <div class="level-title">⚔️ 前 3 關階段總測驗 (Level ${rStartLvl}~${rEndLvl})</div>
+            <div class="level-stats">
+              <span>25 題</span>
+              ${rStatsHTML}
+            </div>
+          `;
+
+          if (!isReviewLocked) {
+            rCard.onclick = () => startReviewTest(reviewId, rStartLvl, rEndLvl, rStartP, rEndP);
+          }
+
+          grid.appendChild(rCard);
+          reviewCounter++;
+        }
+
+        if (i === 49) {
+          const reviewId = 16;
+          const rStartLvl = 46;
+          const rEndLvl = 49;
+          const isReviewLocked = currentUser.unlockedLevel < 49;
+          const rStats16 = getLevelStats(`Review_16`);
+
+          let rStats16HTML = '';
+          if (rStats16.hasPlayed) {
+            const r16PassClass = rStats16.bestScore >= 85 ? 'badge-pass' : 'badge-fail';
+            rStats16HTML = `
+              <span style="display:inline-flex; gap:6px; align-items:center;">
+                <span class="badge ${r16PassClass}">最高 ${rStats16.bestScore}分</span>
+                <span class="badge badge-rank">🏆 第${rStats16.rank}名</span>
+              </span>
+            `;
+          } else {
+            rStats16HTML = `<span>${isReviewLocked ? '<i class="fa-solid fa-lock"></i> 需全通關' : '<i class="fa-solid fa-star"></i> 終極挑戰'}</span>`;
+          }
+
+          const rCard = document.createElement('div');
+          rCard.className = `level-card review-card ${isReviewLocked ? 'locked' : ''}`;
+          rCard.style.borderColor = 'var(--accent-amber)';
+          rCard.innerHTML = `
+            <div class="level-header">
+              <span class="level-number" style="color:var(--accent-amber);"><i class="fa-solid fa-crown"></i> 總測驗 16</span>
+              <span class="page-tag" style="background:rgba(245,158,11,0.25); color:var(--accent-amber);">P.93~P.100</span>
+            </div>
+            <div class="level-title">👑 期末最終總大會考 (Level 46~49)</div>
+            <div class="level-stats">
+              <span>25 題</span>
+              ${rStats16HTML}
+            </div>
+          `;
+
+          if (!isReviewLocked) {
+            rCard.onclick = () => startReviewTest(reviewId, rStartLvl, rEndLvl, 93, 100);
+          }
+
+          grid.appendChild(rCard);
+        }
+      }
+    }r"><i class="fa-solid fa-trophy"></i> 總測驗 ${reviewId}</span>
               <span class="page-tag">P.${rStartP}~P.${rEndP}</span>
             </div>
             <div class="level-title">⚔️ 前 3 關階段總測驗 (Level ${rStartLvl}~${rEndLvl})</div>
