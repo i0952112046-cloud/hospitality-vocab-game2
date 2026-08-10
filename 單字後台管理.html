@@ -125,6 +125,8 @@
       padding: 10px 14px;
       border-radius: 10px;
       outline: none;
+      font-size: 1rem;
+      width: 100%;
     }
 
     .table-responsive {
@@ -204,63 +206,109 @@
       color: var(--accent-cyan);
       margin-top: 4px;
     }
+
+    /* Password Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(2, 6, 23, 0.92);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
-  <div class="header-bar">
-    <div>
-      <h1>專二餐服 教師即時後台管理系統</h1>
-      <p style="color: var(--text-muted); font-size: 0.9rem;">從課本第3頁起，每兩頁一關 (Level 1 = P.3~P.4, Level 2 = P.5~P.6...)</p>
-    </div>
-    <div style="display: flex; gap: 12px;">
-      <button class="btn btn-emerald" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> 匯出全班 Excel 報表</button>
-      <button class="btn" style="background: rgba(255,255,255,0.1);" onclick="generateMockData()"><i class="fa-solid fa-wand-magic-sparkles"></i> 載入模擬測試數據</button>
-    </div>
-  </div>
-
-  <div class="stat-card-grid">
-    <div class="stat-card">
-      <span style="font-size: 0.85rem; color: var(--text-muted);">總學生人數</span>
-      <div class="stat-val" id="stat-total-students">80 人</div>
-    </div>
-    <div class="stat-card">
-      <span style="font-size: 0.85rem; color: var(--text-muted);">平均解鎖進度</span>
-      <div class="stat-val" id="stat-avg-progress" style="color: var(--accent-emerald);">0%</div>
-    </div>
-    <div class="stat-card">
-      <span style="font-size: 0.85rem; color: var(--text-muted);">已完成 49 關人數</span>
-      <div class="stat-val" id="stat-completed-count" style="color: var(--accent-amber);">0 人</div>
+  <!-- Password Verification Modal -->
+  <div id="password-modal" class="modal-overlay">
+    <div class="glass-card modal-content">
+      <div style="font-size: 3rem; color: var(--primary); margin-bottom: 12px;">
+        <i class="fa-solid fa-user-lock"></i>
+      </div>
+      <h2 style="font-family: 'Outfit', sans-serif; margin-bottom: 10px;">教師權限密碼驗證</h2>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">此區域僅限教師存取，請輸入管理密碼</p>
+      
+      <form id="password-form" onsubmit="verifyPassword(event)">
+        <div style="margin-bottom: 16px;">
+          <input type="password" id="password-input" class="form-control" placeholder="請輸入教師管理密碼" required autofocus>
+        </div>
+        <div id="password-error" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 14px; display: none;">
+          <i class="fa-solid fa-circle-exclamation"></i> 密碼錯誤，請重新輸入！
+        </div>
+        <button type="submit" class="btn" style="width: 100%; justify-content: center; padding: 12px;">
+          <i class="fa-solid fa-key"></i> 驗證並進入後台
+        </button>
+      </form>
     </div>
   </div>
 
-  <div class="glass-card">
-    <div class="tab-group">
-      <button class="tab-btn active" id="tab-overview" onclick="switchView('overview')"><i class="fa-solid fa-chart-pie"></i> 學生進度總覽模式</button>
-      <button class="tab-btn" id="tab-level" onclick="switchView('level')"><i class="fa-solid fa-layer-group"></i> 單關詳細檢視模式</button>
-    </div>
-
-    <div class="filter-bar">
-      <label style="font-size: 0.9rem; color: var(--text-muted);"><i class="fa-solid fa-filter"></i> 篩選年級：</label>
-      <select class="form-control" id="filter-grade" onchange="renderCurrentView()">
-        <option value="all">全部年級 (2年級 & 3年級)</option>
-        <option value="2">2 年級</option>
-        <option value="3">3 年級</option>
-      </select>
-
-      <div id="level-select-container" style="display: none; align-items: center; gap: 10px;">
-        <label style="font-size: 0.9rem; color: var(--text-muted);">選擇檢視關卡：</label>
-        <select class="form-control" id="select-level-inspect" onchange="renderCurrentView()">
-          <!-- Added dynamically -->
-        </select>
+  <!-- Dashboard Container -->
+  <div id="dashboard-container" style="display: none;">
+    <div class="header-bar">
+      <div>
+        <h1>專二餐服 教師即時後台管理系統 <span style="font-size:0.9rem; font-weight:normal; color:var(--accent-emerald);"><i class="fa-solid fa-shield-halved"></i> 已授權驗證</span></h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">從課本第3頁起，每兩頁一關 (Level 1 = P.3~P.4, Level 2 = P.5~P.6...)</p>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button class="btn btn-emerald" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> 匯出全班 Excel 報表</button>
+        <button class="btn" style="background: rgba(255,255,255,0.1);" onclick="generateMockData()"><i class="fa-solid fa-wand-magic-sparkles"></i> 載入模擬測試數據</button>
+        <button class="btn" style="background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4);" onclick="logoutTeacher()"><i class="fa-solid fa-lock"></i> 鎖定登出</button>
       </div>
     </div>
 
-    <div class="table-responsive">
-      <table id="main-table">
-        <thead id="table-head"></thead>
-        <tbody id="table-body"></tbody>
-      </table>
+    <div class="stat-card-grid">
+      <div class="stat-card">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">總學生人數</span>
+        <div class="stat-val" id="stat-total-students">80 人</div>
+      </div>
+      <div class="stat-card">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">平均解鎖進度</span>
+        <div class="stat-val" id="stat-avg-progress" style="color: var(--accent-emerald);">0%</div>
+      </div>
+      <div class="stat-card">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">已完成 49 關人數</span>
+        <div class="stat-val" id="stat-completed-count" style="color: var(--accent-amber);">0 人</div>
+      </div>
+    </div>
+
+    <div class="glass-card">
+      <div class="tab-group">
+        <button class="tab-btn active" id="tab-overview" onclick="switchView('overview')"><i class="fa-solid fa-chart-pie"></i> 學生進度總覽模式</button>
+        <button class="tab-btn" id="tab-level" onclick="switchView('level')"><i class="fa-solid fa-layer-group"></i> 單關詳細檢視模式</button>
+      </div>
+
+      <div class="filter-bar">
+        <label style="font-size: 0.9rem; color: var(--text-muted);"><i class="fa-solid fa-filter"></i> 篩選年級：</label>
+        <select class="form-control" id="filter-grade" style="width: auto;" onchange="renderCurrentView()">
+          <option value="all">全部年級 (2年級 & 3年級)</option>
+          <option value="2">2 年級</option>
+          <option value="3">3 年級</option>
+        </select>
+
+        <div id="level-select-container" style="display: none; align-items: center; gap: 10px;">
+          <label style="font-size: 0.9rem; color: var(--text-muted);">選擇檢視關卡：</label>
+          <select class="form-control" id="select-level-inspect" style="width: auto;" onchange="renderCurrentView()">
+            <!-- Added dynamically -->
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table id="main-table">
+          <thead id="table-head"></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -269,7 +317,10 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <script>
-    // Firebase Config (真實專案金鑰)
+    // 教師預設管理密碼 (預設: teacher888)
+    const TEACHER_PASSWORD = "teacher888";
+
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyADnoZbEbfLg9e8CcebJ9k6xhMZdkAXDmk",
       authDomain: "vocab-game-demo.firebaseapp.com",
@@ -286,6 +337,44 @@
     let currentViewMode = 'overview';
 
     document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+    });
+
+    function checkAuth() {
+      const isAuth = sessionStorage.getItem('teacher_authenticated');
+      if (isAuth === 'true') {
+        document.getElementById('password-modal').style.display = 'none';
+        document.getElementById('dashboard-container').style.display = 'block';
+        initDashboard();
+      } else {
+        document.getElementById('password-modal').style.display = 'flex';
+        document.getElementById('dashboard-container').style.display = 'none';
+      }
+    }
+
+    function verifyPassword(e) {
+      e.preventDefault();
+      const inputPass = document.getElementById('password-input').value.trim();
+
+      if (inputPass === TEACHER_PASSWORD) {
+        sessionStorage.setItem('teacher_authenticated', 'true');
+        document.getElementById('password-error').style.display = 'none';
+        document.getElementById('password-modal').style.display = 'none';
+        document.getElementById('dashboard-container').style.display = 'block';
+        initDashboard();
+      } else {
+        document.getElementById('password-error').style.display = 'block';
+        document.getElementById('password-input').value = '';
+        document.getElementById('password-input').focus();
+      }
+    }
+
+    function logoutTeacher() {
+      sessionStorage.removeItem('teacher_authenticated');
+      location.reload();
+    }
+
+    function initDashboard() {
       initLevelSelectOptions();
       try {
         if (firebase.apps.length === 0) {
@@ -297,7 +386,7 @@
         console.warn("使用本地模擬數據");
       }
       generateMockData();
-    });
+    }
 
     function initLevelSelectOptions() {
       const sel = document.getElementById('select-level-inspect');
