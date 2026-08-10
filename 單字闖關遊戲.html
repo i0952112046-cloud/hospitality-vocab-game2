@@ -429,19 +429,19 @@
   <div id="login-modal" class="modal-overlay">
     <div class="glass-card modal-content">
       <h2 style="text-align: center; margin-bottom: 20px; font-family: 'Outfit', sans-serif;">登入餐飲服務闖關系統</h2>
-      <form id="login-form" onsubmit="handleLogin(event)">
+      <form id="login-form" onsubmit="closeModalAndLogin(event); return false;">
         <div class="form-group">
           <label><i class="fa-solid fa-graduation-cap"></i> 年級</label>
-          <select id="select-grade" class="form-control" required>
+          <select id="select-grade" class="form-control">
             <option value="2">2 年級</option>
             <option value="3">3 年級</option>
           </select>
         </div>
         <div class="form-group">
           <label><i class="fa-solid fa-user-tag"></i> 座號 (1 ~ 40)</label>
-          <input type="number" id="input-seat" class="form-control" min="1" max="40" placeholder="請輸入座號" required>
+          <input type="number" id="input-seat" class="form-control" min="1" max="40" placeholder="請輸入座號 (預設 40 號)" value="40">
         </div>
-        <button type="button" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="handleLogin(event)">
+        <button type="button" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="closeModalAndLogin(event)">
           <i class="fa-solid fa-play"></i> 開始挑戰
         </button>
       </form>
@@ -776,17 +776,24 @@
       }
     }
 
-    function handleLogin(e) {
-      if (e) e.preventDefault();
+    function closeModalAndLogin(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      
+      // 1. 強制隱藏登入彈窗 (採用 display: none !important)
+      const modal = document.getElementById('login-modal');
+      if (modal) {
+        modal.style.cssText = 'display: none !important;';
+      }
+
+      // 2. 讀取與驗證年級與座號
       const gradeInput = document.getElementById('select-grade');
       const seatInput = document.getElementById('input-seat');
 
-      const grade = gradeInput ? parseInt(gradeInput.value) : 2;
-      const seat = seatInput ? parseInt(seatInput.value) : 40;
+      const grade = (gradeInput && gradeInput.value) ? parseInt(gradeInput.value) : 2;
+      let seat = (seatInput && seatInput.value) ? parseInt(seatInput.value) : 40;
 
-      if (!seat || isNaN(seat) || seat < 1 || seat > 40) {
-        alert('請輸入 1 至 40 之間的正確座號 (1~40)');
-        return;
+      if (isNaN(seat) || seat < 1 || seat > 40) {
+        seat = 40; // 預設座號 40
       }
 
       currentUser.grade = grade;
@@ -795,22 +802,21 @@
       try {
         localStorage.setItem('vocab_user_grade', grade);
         localStorage.setItem('vocab_user_seat', seat);
-      } catch(e) {}
+      } catch(err) {}
 
-      // 零時差立即關閉登入彈窗
-      const modal = document.getElementById('login-modal');
-      if (modal) modal.style.display = 'none';
-      
       updateUserUI();
 
-      // 非同步極速渲染關卡網格，防止畫面卡頓
-      setTimeout(() => {
-        try {
-          renderLevelGrid();
-        } catch(err) {
-          console.error("更新闖關地圖發生錯誤：", err);
-        }
-      }, 0);
+      try {
+        renderLevelGrid();
+      } catch(err) {
+        console.error("更新闖關地圖錯誤：", err);
+      }
+
+      return false;
+    }
+
+    function handleLogin(e) {
+      return closeModalAndLogin(e);
     }
 
     function switchUser() {
