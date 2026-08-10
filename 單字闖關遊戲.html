@@ -439,7 +439,7 @@
         </div>
         <div class="form-group">
           <label><i class="fa-solid fa-user-tag"></i> 座號 (1 ~ 40)</label>
-          <input type="number" id="input-seat" class="form-control" min="1" max="40" placeholder="請輸入座號 (預設 40 號)" value="40">
+          <input type="number" id="input-seat" class="form-control" min="1" max="40" placeholder="請輸入座號" required autofocus>
         </div>
         <button type="button" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="closeModalAndLogin(event)">
           <i class="fa-solid fa-play"></i> 開始挑戰
@@ -779,21 +779,23 @@
     function closeModalAndLogin(e) {
       if (e && e.preventDefault) e.preventDefault();
       
-      // 1. 強制隱藏登入彈窗 (採用 display: none !important)
-      const modal = document.getElementById('login-modal');
-      if (modal) {
-        modal.style.cssText = 'display: none !important;';
-      }
-
-      // 2. 讀取與驗證年級與座號
       const gradeInput = document.getElementById('select-grade');
       const seatInput = document.getElementById('input-seat');
 
       const grade = (gradeInput && gradeInput.value) ? parseInt(gradeInput.value) : 2;
-      let seat = (seatInput && seatInput.value) ? parseInt(seatInput.value) : 40;
+      const seatVal = seatInput ? seatInput.value.trim() : '';
 
+      if (!seatVal) {
+        alert('請輸入您的座號 (1 ~ 40)');
+        if (seatInput) seatInput.focus();
+        return false;
+      }
+
+      const seat = parseInt(seatVal);
       if (isNaN(seat) || seat < 1 || seat > 40) {
-        seat = 40; // 預設座號 40
+        alert('請輸入 1 至 40 之間的正確座號');
+        if (seatInput) seatInput.focus();
+        return false;
       }
 
       currentUser.grade = grade;
@@ -803,6 +805,12 @@
         localStorage.setItem('vocab_user_grade', grade);
         localStorage.setItem('vocab_user_seat', seat);
       } catch(err) {}
+
+      // 強制隱藏登入彈窗
+      const modal = document.getElementById('login-modal');
+      if (modal) {
+        modal.style.cssText = 'display: none !important;';
+      }
 
       updateUserUI();
 
