@@ -337,8 +337,6 @@
     let currentViewMode = 'overview';
 
     document.addEventListener('DOMContentLoaded', () => {
-      // 每次開啟或重新整理網頁均強制鎖定，須輸入密碼解鎖
-      sessionStorage.removeItem('teacher_authenticated');
       checkAuth();
     });
 

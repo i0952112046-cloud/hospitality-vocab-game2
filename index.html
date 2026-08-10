@@ -18,6 +18,7 @@
       --primary: #6366f1;
       --accent-cyan: #06b6d4;
       --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
@@ -133,6 +134,57 @@
       color: var(--text-muted);
       line-height: 1.4;
     }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .form-control {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      outline: none;
+      font-size: 1rem;
+      width: 100%;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
   </style>
 </head>
 <body>
@@ -143,6 +195,7 @@
       <p class="subtitle">完全無伺服器即時連網架構 ｜ 課本雙頁一關卡 (P.3~P.4起) ｜ 85分及格解鎖</p>
 
       <div class="card-grid">
+        <!-- 學生端按鈕 -->
         <a href="單字闖關遊戲.html" class="portal-btn-card">
           <div class="icon-wrapper student-icon">
             <i class="fa-solid fa-gamepad"></i>
@@ -151,16 +204,69 @@
           <div class="card-desc">單字發音、隨機題目干擾項、動態進度條、實時上傳成績與解鎖關卡</div>
         </a>
 
-        <a href="單字後台管理.html" class="portal-btn-card">
+        <!-- 教師端按鈕 (需點擊輸入密碼) -->
+        <div class="portal-btn-card" onclick="openPasswordModal()">
           <div class="icon-wrapper teacher-icon">
             <i class="fa-solid fa-user-lock"></i>
           </div>
-          <div class="card-title">教師端 即時後台 <i class="fa-solid fa-key" style="font-size:0.8rem; color:var(--accent-amber);"></i></div>
-          <div class="card-desc">密碼防護 ｜ 全班學生進度可視化圖表、單關分數檢視、一鍵匯出 Excel 報表</div>
-        </a>
+          <div class="card-title">教師端 即時後台 <i class="fa-solid fa-lock" style="font-size:0.85rem; color:var(--accent-amber);"></i></div>
+          <div class="card-desc">點擊需填寫教師密碼 ｜ 全班進度圖表、單關分數檢視、一鍵匯出 Excel</div>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Password Verification Modal -->
+  <div id="password-modal" class="modal-overlay">
+    <div class="glass-card modal-content">
+      <div style="font-size: 3rem; color: var(--primary); margin-bottom: 12px;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h2 style="font-family: 'Outfit', sans-serif; margin-bottom: 8px;">進入教師後台權限驗證</h2>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">請輸入教師管理密碼以繼續進入後台</p>
+
+      <form onsubmit="verifyTeacherPassword(event)">
+        <div style="margin-bottom: 16px;">
+          <input type="password" id="modal-pass-input" class="form-control" placeholder="請輸入教師密碼" required autofocus>
+        </div>
+        <div id="modal-pass-error" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 14px; display: none;">
+          <i class="fa-solid fa-circle-exclamation"></i> 密碼錯誤，請重新輸入！
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="closePasswordModal()">取消</button>
+          <button type="submit" class="btn"><i class="fa-solid fa-key"></i> 驗證進入</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const TEACHER_PASSWORD = "teacher888";
+
+    function openPasswordModal() {
+      document.getElementById('password-modal').style.display = 'flex';
+      document.getElementById('modal-pass-input').value = '';
+      document.getElementById('modal-pass-error').style.display = 'none';
+      document.getElementById('modal-pass-input').focus();
+    }
+
+    function closePasswordModal() {
+      document.getElementById('password-modal').style.display = 'none';
+    }
+
+    function verifyTeacherPassword(e) {
+      e.preventDefault();
+      const val = document.getElementById('modal-pass-input').value.trim();
+
+      if (val === TEACHER_PASSWORD) {
+        sessionStorage.setItem('teacher_authenticated', 'true');
+        window.location.href = '單字後台管理.html';
+      } else {
+        document.getElementById('modal-pass-error').style.display = 'block';
+        document.getElementById('modal-pass-input').value = '';
+        document.getElementById('modal-pass-input').focus();
+      }
+    }
+  </script>
 </body>
 </html>
