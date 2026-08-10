@@ -243,7 +243,13 @@
   <script>
     const TEACHER_PASSWORD = "teacher888";
 
+    // 頁面載入時清除過去留存的授權，確保每次點擊都必須輸入密碼
+    document.addEventListener('DOMContentLoaded', () => {
+      sessionStorage.removeItem('teacher_authenticated');
+    });
+
     function openPasswordModal() {
+      sessionStorage.removeItem('teacher_authenticated');
       document.getElementById('password-modal').style.display = 'flex';
       document.getElementById('modal-pass-input').value = '';
       document.getElementById('modal-pass-error').style.display = 'none';
