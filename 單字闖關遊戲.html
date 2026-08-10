@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>專二餐服 雲端單字闖關遊戲</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-cyan: #06b6d4;
+      --accent-pink: #ec4899;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top left, #1e1b4b, #0f172a 60%, #020617);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a5b4fc, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Glass Card */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--glass-shadow);
+      margin-bottom: 24px;
+      transition: transform 0.2s ease;
+    }
+
+    /* User Status Bar */
+    .user-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 20px;
+      margin-bottom: 20px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Level Grid */
+    .level-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 18px;
+    }
+
+    .level-card {
+      position: relative;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .level-card:hover:not(.locked) {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3);
+    }
+
+    .level-card.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
+    }
+
+    .level-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .level-number {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .page-tag {
+      font-size: 0.78rem;
+      background: rgba(99, 102, 241, 0.25);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .level-badge {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .level-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .level-stats {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Modal / Login overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+    }
+
+    /* Game Screen */
+    #game-screen {
+      display: none;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--primary));
+      transition: width 0.3s ease;
+    }
+
+    .question-card {
+      text-align: center;
+      padding: 30px 20px;
+      margin-bottom: 24px;
+    }
+
+    .word-en {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .word-pron {
+      color: var(--accent-cyan);
+      font-size: 1.1rem;
+      margin-bottom: 14px;
+    }
+
+    .audio-btn {
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+    }
+    .audio-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .option-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 1rem;
+      color: white;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .option-btn:hover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.15);
+    }
+
+    .option-btn.correct {
+      background: rgba(16, 185, 129, 0.25) !important;
+      border-color: var(--accent-emerald) !important;
+      color: #6ee7b7;
+    }
+
+    .option-btn.wrong {
+      background: rgba(239, 68, 68, 0.25) !important;
+      border-color: #ef4444 !important;
+      color: #fca5a5;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    /* Result Modal */
+    .result-score {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--accent-amber);
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Modal -->
+  <div id="login-modal" class="modal-overlay">
+    <div class="glass-card modal-content">
+      <h2 style="text-align: center; margin-bottom: 20px; font-family: 'Outfit', sans-serif;">登入闖關系統</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label><i class="fa-solid fa-graduation-cap"></i> 年級</label>
+          <select id="select-grade" class="form-control" required>
+            <option value="2">2 年級</option>
+            <option value="3">3 年級</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-user-tag"></i> 座號 (1 ~ 40)</label>
+          <input type="number" id="input-seat" class="form-control" min="1" max="40" placeholder="請輸入座號" required>
+        </div>
+        <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;">
+          <i class="fa-solid fa-play"></i> 開始挑戰
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>專二餐服 雲端單字闖關遊戲</h1>
+      <p>從課本第 3 頁開始，每 2 頁劃分為一個關卡 (Level 1 = P.3~P.4, Level 2 = P.5~P.6...)</p>
+    </header>
+
+    <!-- User Status -->
+    <div class="user-status-bar">
+      <div class="user-info">
+        <div class="avatar" id="display-avatar">?</div>
+        <div>
+          <div style="font-weight: 700;" id="display-name">尚未登入</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);" id="display-unlocked">最高關卡: Level 1</div>
+        </div>
+      </div>
+      <div>
+        <button class="btn btn-secondary" onclick="switchUser()"><i class="fa-solid fa-right-from-bracket"></i> 切換帳號</button>
+      </div>
+    </div>
+
+    <!-- Level Selection Screen -->
+    <div id="level-screen">
+      <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 style="font-size: 1.25rem;"><i class="fa-solid fa-map-location-dot" style="color: var(--accent-cyan);"></i> 關卡地圖 (課本雙頁為一關，85分及格)</h2>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">完成關卡自動解鎖下一關</span>
+        </div>
+        <div class="level-grid" id="level-grid-container">
+          <!-- Dynamically Generated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Game Play Screen -->
+    <div id="game-screen">
+      <div class="glass-card">
+        <div class="game-header">
+          <button class="btn btn-secondary" onclick="exitGame()"><i class="fa-solid fa-arrow-left"></i> 返回地圖</button>
+          <div id="game-level-title" style="font-weight: 700; color: var(--accent-cyan);">Level 1</div>
+          <div id="game-score" style="font-weight: 700; color: var(--accent-amber);">得分: 0</div>
+        </div>
+
+        <div class="progress-bar-container">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <div class="question-card">
+          <span style="font-size: 0.85rem; color: var(--text-muted);" id="question-count">題目 1 / 20</span>
+          <div class="word-en" id="target-word">Cutlery</div>
+          <div class="word-pron" id="target-pron">[ˈkʌtləri]</div>
+          <button class="audio-btn" onclick="speakCurrentWord()"><i class="fa-solid fa-volume-high"></i></button>
+        </div>
+
+        <div class="options-grid" id="options-container">
+          <!-- Options rendered here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="modal-overlay" style="display: none;">
+      <div class="glass-card modal-content" style="text-align: center;">
+        <h2 id="result-title" style="font-family: 'Outfit';">闖關成功！ 🎉</h2>
+        <div class="result-score" id="result-score-val">90分</div>
+        <p id="result-desc" style="color: var(--text-muted); margin-bottom: 20px;">恭喜通過本關卡，已成功解鎖下一關！</p>
+        <button class="btn" style="width: 100%; justify-content: center;" onclick="closeResultModal()">
+          <i class="fa-solid fa-check"></i> 確定並返回關卡地圖
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase Config (真實專案金鑰)
+    const firebaseConfig = {
+      apiKey: "AIzaSyADnoZbEbfLg9e8CcebJ9k6xhMZdkAXDmk",
+      authDomain: "vocab-game-demo.firebaseapp.com",
+      databaseURL: "https://vocab-game-demo-default-rtdb.firebaseio.com",
+      projectId: "vocab-game-demo",
+      storageBucket: "vocab-game-demo.firebasestorage.app",
+      messagingSenderId: "949892572092",
+      appId: "1:949892572092:web:7fd8b5adaef7d7c48381b9",
+      measurementId: "G-EJG8M94162"
+    };
+
+    let db = null;
+    try {
+      if (firebase.apps.length === 0) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      db = firebase.database();
+    } catch(e) {
+      console.warn("Firebase 未設定真實連線金鑰，將切換至本地 LocalStorage 離線模式。");
+    }
+
+    // 專二餐服單字題庫數據 (含頁碼標註)
+    const VOCAB_DATA = [
+      {
+        level: 1, startPage: 3, endPage: 4, name: "餐具與檯面基本用語",
+        words: [
+          {en: "cutlery", zh: "餐具 (刀叉匙類)", pron: "ˈkʌtləri"},
+          {en: "flatware", zh: "西餐餐具 (金屬類)", pron: "ˈflætweə"},
+          {en: "silverware", zh: "銀器餐具", pron: "ˈsɪlvəweə"},
+          {en: "crockery", zh: "陶磁餐具", pron: "ˈkrɒkəri"},
+          {en: "glassware", zh: "玻璃杯皿", pron: "ˈɡlɑːsweə"},
+          {en: "napkin", zh: "餐巾", pron: "ˈnæpkɪn"},
+          {en: "tablecloth", zh: "桌布", pron: "ˈteɪbəlklɒθ"},
+          {en: "placemat", zh: "餐墊", pron: "ˈpleɪsmæt"},
+          {en: "saucer", zh: "茶碟/杯墊", pron: "ˈsɔːsə"},
+          {en: "side plate", zh: "麵包碟/側盤", pron: "saɪd pleɪt"},
+          {en: "dinner plate", zh: "主餐盤", pron: "ˈdɪnə pleɪt"},
+          {en: "soup bowl", zh: "湯碗", pron: "suːp bəʊl"},
+          {en: "salt shaker", zh: "鹽罐", pron: "sɔːlt ˈʃeɪkə"},
+          {en: "pepper shaker", zh: "胡椒罐", pron: "ˈpepə ˈʃeɪkə"},
+          {en: "toothpick", zh: "牙籤", pron: "ˈtuːθpɪk"},
+          {en: "water goblet", zh: "水杯/高腳水杯", pron: "ˈwɔːtə ˈɡɒblət"},
+          {en: "wine glass", zh: "葡萄酒杯", pron: "waɪn ɡlɑːs"},
+          {en: "champagne flute", zh: "香檳杯", pron: "ʃæmˈpeɪn fluːt"},
+          {en: "decanter", zh: "醒酒瓶", pron: "dɪˈkæntə"},
+          {en: "corkscrew", zh: "開酒器/開瓶器", pron: "ˈkɔːkskruː"}
+        ]
+      },
+      {
+        level: 2, startPage: 5, endPage: 6, name: "餐廳職位與團隊",
+        words: [
+          {en: "maître d'", zh: "餐廳經理/總管", pron: "ˌmeɪtrə ˈdiː"},
+          {en: "hostess", zh: "女接待員/領檯", pron: "ˈhəʊstəs"},
+          {en: "receptionist", zh: "接待員", pron: "rɪˈsepʃənɪst"},
+          {en: "captain", zh: "領班/桌長", pron: "ˈkæptɪn"},
+          {en: "waiter", zh: "男服務員", pron: "ˈweɪtə"},
+          {en: "waitress", zh: "女服務員", pron: "ˈweɪtrəs"},
+          {en: "busboy", zh: "撤碗盤助理/初級服務員", pron: "ˈbʌsbɔɪ"},
+          {en: "sommelier", zh: "侍酒師", pron: "səˈmelieɪ"},
+          {en: "bartender", zh: "調酒師", pron: "ˈbɑːtendə"},
+          {en: "head chef", zh: "主廚", pron: "hed ʃef"},
+          {en: "sous chef", zh: "副主廚", pron: "suː ʃef"},
+          {en: "pastry chef", zh: "點心師傅/甜點廚師", pron: "ˈpeɪstri ʃef"},
+          {en: "cashier", zh: "出納員/收銀員", pron: "kæˈʃɪə"},
+          {en: "concierge", zh: "禮賓人員", pron: "kɒnˈsiɛəʒ"},
+          {en: "manager", zh: "經理", pron: "ˈmænɪdʒə"},
+          {en: "supervisor", zh: "主管", pron: "ˈsuːpəvaɪzə"},
+          {en: "dishwasher", zh: "洗碗工", pron: "ˈdɪʃwɒʃə"},
+          {en: "barista", zh: "咖啡師", pron: "bəˈriːstə"},
+          {en: "caterer", zh: "外辦外燴業者", pron: "ˈkeɪtərə"},
+          {en: "trainee", zh: "實習生", pron: "treɪˈniː"}
+        ]
+      },
+      {
+        level: 3, startPage: 7, endPage: 8, name: "菜單與菜餚順序",
+        words: [
+          {en: "appetizer", zh: "開胃菜/前菜", pron: "ˈæpətaɪzə"},
+          {en: "starter", zh: "開胃餐點", pron: "ˈstɑːtə"},
+          {en: "entrée", zh: "主菜/前菜", pron: "ˈɒntreɪ"},
+          {en: "main course", zh: "主菜", pron: "meɪn kɔːs"},
+          {en: "soup", zh: "湯品", pron: "suːp"},
+          {en: "salad", zh: "沙拉", pron: "ˈsæləd"},
+          {en: "dessert", zh: "甜點", pron: "dɪˈzɜːt"},
+          {en: "beverage", zh: "飲料", pron: "ˈbevərɪdʒ"},
+          {en: "aperitif", zh: "餐前酒", pron: "əˌperəˈtiːf"},
+          {en: "digestif", zh: "餐後酒", pron: "diːʒesˈtiːf"},
+          {en: "side dish", zh: "副菜/配菜", pron: "saɪd dɪʃ"},
+          {en: "specialty", zh: "招牌菜/特色菜", pron: "ˈspeʃəlti"},
+          {en: "buffet", zh: "自助餐", pron: "ˈbʊfeɪ"},
+          {en: "a la carte", zh: "單點菜單", pron: "ˌɑː lɑː ˈkɑːt"},
+          {en: "table d'hote", zh: "套餐菜單", pron: "ˌtɑːbəl ˈdəʊt"},
+          {en: "combo", zh: "組合餐", pron: "ˈkɒmbəʊ"},
+          {en: "dressing", zh: "沙拉醬", pron: "ˈdresɪŋ"},
+          {en: "condiment", zh: "調味料", pron: "ˈkɒndɪmənt"},
+          {en: "garnish", zh: "盤飾/裝飾物", pron: "ˈɡɑːnɪʃ"},
+          {en: "plat du jour", zh: "今日特餐", pron: "plɑː dy ʒuːr"}
+        ]
+      },
+      {
+        level: 4, startPage: 9, endPage: 10, name: "訂位與接待用語",
+        words: [
+          {en: "reservation", zh: "預約/訂位", pron: "ˌrezəˈveɪʃən"},
+          {en: "booking", zh: "預訂", pron: "ˈbʊkɪŋ"},
+          {en: "walk-in", zh: "未預約直接到店顧客", pron: "wɔːk ɪn"},
+          {en: "party", zh: "同行搭檔/同行顧客群", pron: "ˈpɑːti"},
+          {en: "confirmation", zh: "確認/確認信", pron: "ˌkɒnfəˈmeɪʃən"},
+          {en: "cancelation", zh: "取消", pron: "ˌkænsəˈleɪʃən"},
+          {en: "deposit", zh: "訂金", pron: "dɪˈpɒzɪt"},
+          {en: "availability", zh: "空位狀況/可用性", pron: "əˌveɪləˈbɪləti"},
+          {en: "waiting list", zh: "候補名單", pron: "ˈweɪtɪŋ lɪst"},
+          {en: "booth", zh: "包廂座/卡座", pron: "buːð"},
+          {en: "patio", zh: "戶外露天座位區", pron: "ˈpætiəʊ"},
+          {en: "high chair", zh: "兒童高腳椅", pron: "haɪ tʃeə"},
+          {en: "wheelchair", zh: "輪椅 access", pron: "ˈwiːltʃeə"},
+          {en: "seating plan", zh: "座位安排圖", pron: "ˈsiːtɪŋ plæn"},
+          {en: "cloakroom", zh: "寄物處/衣帽間", pron: "ˈkləʊkruːm"},
+          {en: "vip room", zh: "貴賓室", pron: "viː aɪ piː ruːm"},
+          {en: "non-smoking", zh: "禁菸區", pron: "nɒn ˈsməʊkɪŋ"},
+          {en: "smoking area", zh: "吸菸區", pron: "ˈsməʊkɪŋ ˈeəriə"},
+          {en: "minimum charge", zh: "最低消費", pron: "ˈmɪnɪməm tʃɑːdʒ"},
+          {en: "dress code", zh: "服裝規定", pron: "dres kəʊd"}
+        ]
+      },
+      {
+        level: 5, startPage: 11, endPage: 12, name: "服務流程與應對技巧",
+        words: [
+          {en: "greeting", zh: "打招呼/問候", pron: "ˈɡriːtɪŋ"},
+          {en: "escort", zh: "引導/帶位", pron: "ɪˈskɔːt"},
+          {en: "recommend", zh: "推薦", pron: "ˌrekəˈmend"},
+          {en: "suggest", zh: "建議", pron: "səˈdʒest"},
+          {en: "order", zh: "點餐/訂單", pron: "ˈɔːdə"},
+          {en: "serve", zh: "上菜/服務", pron: "sɜːv"},
+          {en: "clear", zh: "撤盤/清理", pron: "klɪə"},
+          {en: "refill", zh: "續杯/加水", pron: "ˌriːˈfɪl"},
+          {en: "compliment", zh: "致意/稱讚", pron: "ˈkɒmplɪmənt"},
+          {en: "complaint", zh: "客訴/抱怨", pron: "kəmˈpleɪnt"},
+          {en: "apologize", zh: "致歉", pron: "əˈpɒlədʒaɪz"},
+          {en: "replace", zh: "更換", pron: "rɪˈpleɪs"},
+          {en: "spill", zh: "打翻/溢出", pron: "spɪl"},
+          {en: "stain", zh: "污漬", pron: "steɪn"},
+          {en: "bill", zh: "帳單 (英式)", pron: "bɪl"},
+          {en: "check", zh: "帳單 (美式)", pron: "tʃek"},
+          {en: "gratuity", zh: "小費/服務費", pron: "ɡrəˈtjuːəti"},
+          {en: "tip", zh: "小費", pron: "tɪp"},
+          {en: "receipt", zh: "收據/發票", pron: "rɪˈsiːt"},
+          {en: "feedback", zh: "顧客回饋", pron: "ˈfiːdbæk"}
+        ]
+      }
+    ];
+
+    // 全局狀態
+    let currentUser = {
+      grade: null, seat: null, unlockedLevel: 1
+    };
+
+    let currentGame = {
+      level: 1, questions: [], currentIndex: 0, score: 0, correctCount: 0
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserData();
+      document.getElementById('login-form').addEventListener('submit', handleLogin);
+    });
+
+    function loadUserData() {
+      const savedGrade = localStorage.getItem('vocab_user_grade');
+      const savedSeat = localStorage.getItem('vocab_user_seat');
+      const savedUnlocked = localStorage.getItem('vocab_user_unlocked') || 1;
+
+      if (savedGrade && savedSeat) {
+        currentUser.grade = parseInt(savedGrade);
+        currentUser.seat = parseInt(savedSeat);
+        currentUser.unlockedLevel = parseInt(savedUnlocked);
+
+        document.getElementById('login-modal').style.display = 'none';
+        updateUserUI();
+        renderLevelGrid();
+      } else {
+        document.getElementById('login-modal').style.display = 'flex';
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const grade = parseInt(document.getElementById('select-grade').value);
+      const seat = parseInt(document.getElementById('input-seat').value);
+
+      if (!seat || seat < 1 || seat > 40) {
+        alert('請輸入 1 至 40 之間的正確座號');
+        return;
+      }
+
+      currentUser.grade = grade;
+      currentUser.seat = seat;
+      
+      localStorage.setItem('vocab_user_grade', grade);
+      localStorage.setItem('vocab_user_seat', seat);
+      
+      document.getElementById('login-modal').style.display = 'none';
+      updateUserUI();
+      renderLevelGrid();
+    }
+
+    function switchUser() {
+      localStorage.removeItem('vocab_user_grade');
+      localStorage.removeItem('vocab_user_seat');
+      document.getElementById('login-modal').style.display = 'flex';
+    }
+
+    function updateUserUI() {
+      document.getElementById('display-avatar').innerText = currentUser.seat;
+      document.getElementById('display-name').innerText = `${currentUser.grade} 年級 ${currentUser.seat} 號`;
+      document.getElementById('display-unlocked').innerText = `最高解鎖關卡: Level ${currentUser.unlockedLevel}`;
+    }
+
+    // 繪製 49 關卡地圖卡片 (包含標註頁碼: 從第3頁開始，一關2頁)
+    function renderLevelGrid() {
+      const grid = document.getElementById('level-grid-container');
+      grid.innerHTML = '';
+
+      for (let i = 1; i <= 49; i++) {
+        const startP = 3 + (i - 1) * 2;
+        const endP = startP + 1;
+        const pageLabel = `P.${startP}~P.${endP}`;
+
+        const levelData = VOCAB_DATA.find(l => l.level === i) || {
+          level: i,
+          name: `進階餐旅單字關卡 ${i}`,
+          words: VOCAB_DATA[0].words
+        };
+
+        const isLocked = i > currentUser.unlockedLevel;
+
+        const card = document.createElement('div');
+        card.className = `level-card ${isLocked ? 'locked' : ''}`;
+        card.innerHTML = `
+          <div class="level-header">
+            <span class="level-number">LEVEL ${i}</span>
+            <span class="page-tag"><i class="fa-solid fa-book-open"></i> ${pageLabel}</span>
+          </div>
+          <div class="level-title">${levelData.name}</div>
+          <div class="level-stats">
+            <span>20 題</span>
+            <span>${isLocked ? '<i class="fa-solid fa-lock"></i> 未解鎖' : '<i class="fa-solid fa-unlock"></i> 可挑戰 (>=85分)'}</span>
+          </div>
+        `;
+
+        if (!isLocked) {
+          card.onclick = () => startLevel(i, startP, endP);
+        }
+
+        grid.appendChild(card);
+      }
+    }
+
+    // 開始關卡
+    function startLevel(levelNum, startP, endP) {
+      const levelData = VOCAB_DATA.find(l => l.level === levelNum) || {
+        level: levelNum,
+        name: `進階餐旅單字關卡 ${levelNum}`,
+        words: VOCAB_DATA[0].words
+      };
+      
+      currentGame.level = levelNum;
+      currentGame.currentIndex = 0;
+      currentGame.score = 0;
+      currentGame.correctCount = 0;
+
+      const allWords = [...levelData.words];
+      shuffleArray(allWords);
+
+      currentGame.questions = allWords.map(target => {
+        const otherWords = levelData.words.filter(w => w.en !== target.en);
+        shuffleArray(otherWords);
+        const distractors = otherWords.slice(0, 3).map(w => w.zh);
+        
+        const options = [target.zh, ...distractors];
+        shuffleArray(options);
+
+        return {
+          en: target.en, zh: target.zh, pron: target.pron, options: options
+        };
+      });
+
+      document.getElementById('level-screen').style.display = 'none';
+      document.getElementById('game-screen').style.display = 'block';
+      document.getElementById('game-level-title').innerText = `Level ${levelNum} (P.${startP}~P.${endP}): ${levelData.name}`;
+
+      showCurrentQuestion();
+    }
+
+    function showCurrentQuestion() {
+      const q = currentGame.questions[currentGame.currentIndex];
+      const total = currentGame.questions.length;
+
+      document.getElementById('question-count').innerText = `題目 ${currentGame.currentIndex + 1} / ${total}`;
+      document.getElementById('target-word').innerText = q.en;
+      document.getElementById('target-pron').innerText = `[${q.pron || ''}]`;
+      document.getElementById('game-score').innerText = `得分: ${currentGame.score}`;
+
+      const progressPct = ((currentGame.currentIndex) / total) * 100;
+      document.getElementById('progress-fill').style.width = `${progressPct}%`;
+
+      const optionsGrid = document.getElementById('options-container');
+      optionsGrid.innerHTML = '';
+
+      q.options.forEach((optText, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerHTML = `<span style="font-weight:700; color:var(--accent-cyan);">${String.fromCharCode(65 + i)}.</span> ${optText}`;
+        btn.onclick = () => selectAnswer(btn, optText, q.zh);
+        optionsGrid.appendChild(btn);
+      });
+
+      speakCurrentWord();
+    }
+
+    function selectAnswer(btn, selectedZh, correctZh) {
+      const allBtns = document.querySelectorAll('.option-btn');
+      allBtns.forEach(b => b.onclick = null);
+
+      if (selectedZh === correctZh) {
+        btn.classList.add('correct');
+        currentGame.score += 5;
+        currentGame.correctCount += 1;
+      } else {
+        btn.classList.add('wrong');
+        allBtns.forEach(b => {
+          if (b.innerText.includes(correctZh)) {
+            b.classList.add('correct');
+          }
+        });
+      }
+
+      setTimeout(() => {
+        currentGame.currentIndex++;
+        if (currentGame.currentIndex < currentGame.questions.length) {
+          showCurrentQuestion();
+        } else {
+          finishGame();
+        }
+      }, 1200);
+    }
+
+    function speakCurrentWord() {
+      const wordText = currentGame.questions[currentGame.currentIndex]?.en;
+      if ('speechSynthesis' in window && wordText) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(wordText);
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function finishGame() {
+      const finalScore = currentGame.score;
+      const passed = finalScore >= 85;
+
+      document.getElementById('result-modal').style.display = 'flex';
+      document.getElementById('result-score-val').innerText = `${finalScore} 分`;
+
+      if (passed) {
+        document.getElementById('result-title').innerText = '闖關成功！ 🎉';
+        document.getElementById('result-desc').innerText = `恭喜達成 ${finalScore} 分！成功解鎖關卡地圖下一關！`;
+        
+        if (currentGame.level >= currentUser.unlockedLevel && currentUser.unlockedLevel < 50) {
+          currentUser.unlockedLevel = currentGame.level + 1;
+          localStorage.setItem('vocab_user_unlocked', currentUser.unlockedLevel);
+        }
+      } else {
+        document.getElementById('result-title').innerText = '再接再厲！ 💪';
+        document.getElementById('result-desc').innerText = `本次得分 ${finalScore} 分，未達 85 分及格標準，請再次挑戰！`;
+      }
+
+      submitScoreToFirebase(currentGame.level, finalScore);
+      updateUserUI();
+      renderLevelGrid();
+    }
+
+    function closeResultModal() {
+      document.getElementById('result-modal').style.display = 'none';
+      exitGame();
+    }
+
+    function exitGame() {
+      document.getElementById('game-screen').style.display = 'none';
+      document.getElementById('level-screen').style.display = 'block';
+    }
+
+    function submitScoreToFirebase(levelNum, scoreVal) {
+      const scoreData = {
+        grade: currentUser.grade,
+        seat_no: currentUser.seat,
+        level: levelNum,
+        score: scoreVal,
+        completed_at: new Date().toISOString()
+      };
+
+      if (db) {
+        db.ref('scores').push(scoreData).then(() => {
+          db.ref(`students/${currentUser.grade}/${currentUser.seat}/unlocked_level`).set(currentUser.unlockedLevel);
+        }).catch(err => {
+          console.log("Firebase 寫入離線測試中。");
+        });
+      }
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+  </script>
+</body>
+</html>
