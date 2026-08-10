@@ -997,52 +997,6 @@
           grid.appendChild(rCard);
         }
       }
-    }r"><i class="fa-solid fa-trophy"></i> 總測驗 ${reviewId}</span>
-              <span class="page-tag">P.${rStartP}~P.${rEndP}</span>
-            </div>
-            <div class="level-title">⚔️ 前 3 關階段總測驗 (Level ${rStartLvl}~${rEndLvl})</div>
-            <div class="level-stats">
-              <span>25 題綜合抽樣</span>
-              <span>${isReviewLocked ? '<i class="fa-solid fa-lock"></i> 需通過Level ' + i : '<i class="fa-solid fa-shield-halved"></i> 開啟挑戰'}</span>
-            </div>
-          `;
-
-          if (!isReviewLocked) {
-            rCard.onclick = () => startReviewTest(reviewId, rStartLvl, rEndLvl, rStartP, rEndP);
-          }
-
-          grid.appendChild(rCard);
-          reviewCounter++;
-        }
-
-        if (i === 49) {
-          const reviewId = 16;
-          const rStartLvl = 46;
-          const rEndLvl = 49;
-          const isReviewLocked = currentUser.unlockedLevel < 49;
-
-          const rCard = document.createElement('div');
-          rCard.className = `level-card review-card ${isReviewLocked ? 'locked' : ''}`;
-          rCard.style.borderColor = 'var(--accent-amber)';
-          rCard.innerHTML = `
-            <div class="level-header">
-              <span class="level-number" style="color:var(--accent-amber);"><i class="fa-solid fa-crown"></i> 總測驗 16</span>
-              <span class="page-tag" style="background:rgba(245,158,11,0.25); color:var(--accent-amber);">P.93~P.100</span>
-            </div>
-            <div class="level-title">👑 期末最終總大會考 (Level 46~49)</div>
-            <div class="level-stats">
-              <span>25 題綜合抽樣</span>
-              <span>${isReviewLocked ? '<i class="fa-solid fa-lock"></i> 需全通關' : '<i class="fa-solid fa-star"></i> 終極挑戰'}</span>
-            </div>
-          `;
-
-          if (!isReviewLocked) {
-            rCard.onclick = () => startReviewTest(reviewId, rStartLvl, rEndLvl, 93, 100);
-          }
-
-          grid.appendChild(rCard);
-        }
-      }
     }
 
     function startLevel(levelNum, startP, endP) {
